@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugged by Shayo</title>
+    
+    <!-- Favicon link element (ICO format) -->
+    <link rel="icon" type="C:\Users\HP\Downloads\favicon.ico" href="favicon.ico">
+    <!-- Font Awesome for WhatsApp Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .logo {
+            position: absolute;
+            left:20px;
+            height: 60px;
+            width: auto;
+        }
+        
+        .logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        .header-content {
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        nav {
+            background: #1e40af;
+            padding: 10px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #e0f2fe;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .category {
+            margin-bottom: 50px;
+        }
+        
+        .category h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #1e40af;
+            border-bottom: 3px solid #0ea5e9;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .category-icon {
+            font-size: 2.2em;
+            min-width: 50px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.2);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: #e0f2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.9em;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .product-info h3 {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+        
+        .product-info p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #1e40af;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #0ea5e9;
+        }
+        
+        footer {
+            background: #1e40af;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+        
+        footer p {
+            opacity: 0.9;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+        
+        .whatsapp-btn {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background 0.3s, transform 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .whatsapp-btn:hover {
+            background: #1faa4e;
+            transform: scale(1.05);
+        }
+        
+        .whatsapp-icon {
+            margin-right: 10px;
+        }
+        
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25d366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .whatsapp-float:hover {
+            background: #1faa4e;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://lh4.googleusercontent.com/-_L0uiL1Y7ZA/AAAAAAAAAAI/AAAAAAAAAAA/7a0yem3jZtg/s50-c-k-mo/photo.jpg"  alt="Plugged by Shayo Logo">
+        </div>
+        <div class="header-content">
+            <h1>Plugged by Shayo</h1>
+            <p>Wear Your Vibe </p> <p><i>- Your one-stop shop for authentic sneakers, fits,sandals & new era caps -</i></p>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <div class="hero">
+        <h2>Call/Text Us Now ! </h2>
+        <p>Premium quality sneakers, shoes & New era caps delivered to your door</p>
+        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20placing%20an%20order%20from%20Plugged%20by%20Shayo" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp whatsapp-icon"></i>Inquire via WhatsApp
+        </a>
+    </div>
+    
+    <nav>
+        <a href="#nike">Nike</a>
+        <a href="#jordan">Jordans</a>
+        <a href="#vans">Vans</a>
+        <a href="#newbalance">New Balance</a>
+        <a href="#airforce">Air Force</a>
+        <a href="#sandals">sandals</a>
+        <a href="#new eras">New era caps&shirts</a>
+    </nav>
+    
+    <div class="container">
+        
+        <!-- NIKE SECTION -->
+        <div class="category" id="nike">
+            <h2>
+                <span class="category-icon"><i class="fab fa-nike"></i></span>
+                Nike Sneakers
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMD-_ksx-qam6iJ165sLfWN4P6P2wZe19RI4mq_UZrmQ&s=10" alt="Nike Air Max">
+                    </div>
+                    <div class="product-info">
+                        <h3>Nike Air Max</h3>
+                        <p>TEXT US MORE DESIGNS AND COLORS AVAILABLE</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Nike%20Air%20Max%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                                       <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCroRH4kE8NMTeCxJcffGpdvx1NsK4ciH2i6mtSHHd-Q&s=10" alt="Nike Black">
+                    </div>
+                    <div class="product-info">
+                        <h3>Airforce Black</h3>
+                        <p>ksh.2,200/= </p>
+                        <p>TEXT US MORE DESIGNS AND COLORS AVAILABLE</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Nike%20Air%20Max%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThBqg2qbZ6g39fsVFxlwpq0WRGd2y8-Tfit1PlK3GJGw&s=10" alt="Nike White">
+                    </div>
+                    <div class="product-info">
+                        <h3>Airforce White</h3>
+                        <p>ksh.2,200/= </p>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Nike%20React%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRRQNVZBxtg-kQwK98YKJYS8tFNYDNtEm4XwXs6dpvww&s=10" alt="Nike shox">
+                    </div>
+                    <div class="product-info">
+                        <h3>Nike Shox</h3>
+                        <p>ksh.4,000/= </p>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Nike%20Court%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- JORDAN SECTION -->
+        <div class="category" id="jordan">
+            <h2>
+                <span class="category-icon"><i class="fab fa-jordan"></i></span>
+                Air Jordans
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPJYWHsGY0l82K4dJjMVoB0d_lumKryvNs3tvNO0V57A&s=10" alt="Jordan 1">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Jordan 1</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%201%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT399aaF8wwTDDXc6E0KKW3wslx0Bd5MyscgfvoZ86-zQ&s=10" alt="Jordan 3">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Jordan 3</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%203%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRObRHq82kSNfaiPmtNg5mkT5NEPgCDcIRZrYhkZ-UjGQ&s=10" alt="Jordan 11">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Jordan 11</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%2011%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+</div>
+                </div>
+<div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxn93ziy9TXtbAuEZxUccpDn5w737H6hcijIiP3eMisA&s=10" alt="air Jordan 4 rm">
+                    </div>
+                    <div class="product-info">
+                        <h3>Nike Air Jordan 4 RM</h3>
+                        <P>Ksh.3,800/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%2011%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VANS SECTION -->
+        <div class="category" id="vans">
+            <h2>
+                
+                Vans Sneakers
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJ_wHnYjDjACdO4EKMmdFw2QV6Hqi66SmtN53gNCBIrg&s" alt="Vans Old Skool">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vans Old Skool</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Vans%20Old%20Skool%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZX80PLW4sXLyzzQj13tdzDJMqT0_SET-8updQWes31A&s=10" alt="Vans Slip On">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vans Slip-On</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Vans%20Slip-On%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcWJFSyqN8Lzw_BaIxYNdPuUM2sQ-9zA72uyTeJ54Sgw&s=10" alt="Vans High Top">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vans High Top</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Vans%20High%20Top%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NEW BALANCE SECTION -->
+        <div class="category" id="newbalance">
+            <h2>
+                
+                New Balance Sneakers
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo1LZMV7Y8k3R9xZSzheSh3iC3dgRDomVLZ4pTdDL22Q&s" alt="New Balance 574">
+                    </div>
+                    <div class="product-info">
+                        <h3>New Balance 574</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20New%20Balance%20574%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp_aR_Xo6rYyf-xUp0xSYg-EJH_Qh-lg4FIyGpZk5VoA&s=10" alt="New Balance 990">
+                    </div>
+                    <div class="product-info">
+                        <h3>New Balance 990</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20New%20Balance%20990%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0-eqjQDiWUKGQCBTa2pIEh65KcFZcSUYZZRkkzhU4LQ&s" alt="New Balance 997">
+                    </div>
+                    <div class="product-info">
+                        <h3>New Balance 997</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20New%20Balance%20997%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AIR FORCE SECTION -->
+        <div class="category" id="airforce">
+            <h2>
+                <span class="category-icon"><i class="fab fa-nike"></i></span>
+                Air Force Shoes
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRih3ZgscodPb-IyGYH7n_nrbv9sQdm5kcNoVVUQdkv_w&s=10" alt="Air Force 1">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Force 1 Low</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Force%201%20Low%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7auHPQ78oE2sYyoCqIy21GKrSXiqqG77BVuzlkcJYjQ&s=10">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Force 1 Mid</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Force%201%20Mid%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVi3CGK7MP8f3qKxvudkcf3VDFHzIaL83a5UPAHoKC-g&s=10" alt="Air Force High">
+                    </div>
+                    <div class="product-info">
+                        <h3>Air Force 1 High</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Force%201%20High%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SANDALS SECTION -->
+        <div class="category" id="keens">
+            <h2>
+                
+               SANDALS
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSofTxxNwEwrH34riUagp_DZwdaYO-d4Nd9Kx3QprsozA&s=10" alt="SANDALS">
+                    </div>
+                    <div class="product-info">
+                        <h3>SANDALS</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Keen%20Hiking%20Boot%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3wvsj8UC_U-zc3CZ8lP_KnjvD2DjaMsNNvX0eh16sfQ&s=10" alt="Keen Sandal">
+                    </div>
+                    <div class="product-info">
+                        <h3>Keen Sandal</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Keen%20Sandal%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ7jlVJ_O0R9L7c3fyHxEyMAvoawmCSDTKZuSwbv8YLgJPHarRCRAfYXkHFlJAHdLhleKX8o_3vNBQw9T7I_Rhlrb3X2u4R_4mIQQrs5U_xZWodtvYZ6ZAt&usqp=CAc" alt="SUED CROC">
+                    </div>
+                    <div class="product-info">
+                        <h3>SUED CROCS</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Keen%20Work%20Boot%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BASEBALL CAPS SECTION -->
+        <div class="category" id="NEW ERA">
+            <h2>
+               
+                New Era CaPS & Shirts
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://www.famcapstore.com/cdn/shop/collections/P3030722_45b8e201-6323-477d-90bf-1a9d5ab101a6.jpg?v=1730137730" alt="Classic Cap">
+                    </div>
+                    <div class="product-info">
+                        <h3>new era caps Cap</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Classic%20Baseball%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa8y2bSck880Eub9KfCW99L_tryKVn6ZYm8NlYYF3E5khbmUq0xeuEqV8&s=10" alt="NEW ERA SHIRT">
+                    </div>
+                    <div class="product-info">
+                        <h3>new era shirt</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Sports%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="C:\Users\HP\Downloads\vintage new era.jpg" alt="Vintage Cap">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vintage new era Cap</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Vintage%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+ <!-- OFFICIAL SHOES -->
+        <div class="category" id="OFFICIAL SHOES">
+            <h2>
+                
+                OFFICIAL SHOES
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://www.topplinekenya.com/web/image/product.product/65374/image_1024/Clarks%20Wallabee%20Men%E2%80%99s%20Leather%20Moccasin%20Shoes%20Classic%20Lace%20Up%20Casual%20Comfort%20Shoes%20Black%20Brown%20Grey%20(39,%20Black)?unique=9e8f33f" alt="ClaRKS">
+                    </div>
+                    <div class="product-info">
+                        <h3>CLARKS</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Classic%20Baseball%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://ke.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/32/0726723/1.jpg?8005" alt="TIMBERLAND">
+                    </div>
+                    <div class="product-info">
+                        <h3>TIMBER LAND</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Sports%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://ke.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/12/3495823/1.jpg?2790" alt="TOMMY HILFIGER">
+                    </div>
+                    <div class="product-info">
+                        <h3>Tommy Hilfiger</h3>
+                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Vintage%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    <footer>
+        <p>&copy; 2026 Plugged by Shayo. All rights reserved.</p>
+        <p>
+            WhatsApp: <a href="https://wa.me/254112958414" target="_blank" style="color: #e0f2fe; text-decoration: none;"><i class="fab fa-whatsapp"></i> +254112958414</a> | 
+            Instagram: <a href="https://www.instagram.com/plugged__by__.shayo?stkn=MWV5OWlueHc1NHd2Nw==" target="_blank" style="color: #e0f2fe; text-decoration: none;"><i class="fab fa-instagram"></i> @plugged__by__.shayo</a> | 
+            Email: info@pluggedbyshayo.com
+        </p>
+    </footer>
+    
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/254112958414" class="whatsapp-float" target="_blank" title="Chat with us on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</body>
+</html>
