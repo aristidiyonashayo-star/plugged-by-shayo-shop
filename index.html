@@ -105,13 +105,13 @@
         }
         
         .category-icon {
-            font-size: 2.2em;
+            font-size: 2.0em.0em;
             min-width: 50px;
         }
         
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 30px;
         }
         
@@ -153,7 +153,7 @@
         }
         
         .product-info h3 {
-            font-size: 1.2em;
+            font-size: 1.0em;
             margin-bottom: 8px;
             color: #1e40af;
         }
@@ -258,6 +258,72 @@
             background: #1faa4e;
             transform: scale(1.1);
         }
+
+        /* Mobile: show 3 compact product cards across */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px 6px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 7px;
+            }
+
+            .product-card {
+                border-radius: 6px;
+            }
+
+            .product-image {
+                height: 105px;
+            }
+
+            .product-info {
+                padding: 7px 3px;
+            }
+
+            .product-info h3 {
+                font-size: 0.72em;
+                margin-bottom: 4px;
+            }
+
+            .product-info p {
+                font-size: 0.62em;
+                margin-bottom: 6px;
+            }
+
+            .btn {
+                padding: 5px 4px;
+                font-size: 0.62em;
+                border-radius: 4px;
+            }
+
+            .category h2 {
+                font-size: 1.25em;
+                margin-bottom: 12px;
+                padding-bottom: 6px;
+                gap: 6px;
+            }
+
+            .category-icon {
+                font-size: 1em;
+                min-width: 25px;
+            }
+
+            .category {
+                margin-bottom: 28px;
+            }
+
+            nav {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            nav a {
+                margin: 0 7px;
+                font-size: 0.8em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -288,6 +354,8 @@
         <a href="#airforce">Air Force</a>
         <a href="#sandals">sandals</a>
         <a href="#new eras">New era caps&shirts</a>
+        <a href="#Adidas">Official Shoes</a>
+        
     </nav>
     
     <div class="container">
@@ -308,7 +376,8 @@
                         <p>TEXT US MORE DESIGNS AND COLORS AVAILABLE</p>
                         <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Nike%20Air%20Max%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
                     </div>
-                                       <div class="products-grid">
+                </div>
+
                 <div class="product-card">
                     <div class="product-image">
                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCroRH4kE8NMTeCxJcffGpdvx1NsK4ciH2i6mtSHHd-Q&s=10" alt="Nike Black">
@@ -346,6 +415,7 @@
                 </div>
             </div>
         </div>
+            
         
         <!-- JORDAN SECTION -->
         <div class="category" id="jordan">
@@ -384,9 +454,9 @@
                         <h3>Air Jordan 11</h3>
                         <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
                         <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%2011%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
-</div>
+          </div>
                 </div>
-<div class="product-card">
+         <div class="product-card">
                     <div class="product-image">
                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxn93ziy9TXtbAuEZxUccpDn5w737H6hcijIiP3eMisA&s=10" alt="air Jordan 4 rm">
                     </div>
@@ -400,7 +470,59 @@
                 </div>
             </div>
         </div>
-        
+        <!-- ADIDAS SECTION -->
+        <div class="category" id="jordan">
+            <h2>
+                <span class="category-icon"><i class="fab fa-Adidas"></i></span>
+                Adidas
+            </h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTuUlH788hF_anyLDzY1r5q2qsidMdmx9Q6OhWgLTBN4XWeFjnpJlqn8tExnYELNCVn0ad5l5OCs87Ow7DxAxrDQhjnZ-cYH4f2lPNnx6eYebxLAXFNDf2yPhFAzSdCgdlCEBg3zLs&usqp=CAc" alt="Jordan 1">
+                    </div>
+                    <div class="product-info">
+                        <h3>ADIDAS CAMPUS</h3>
+                        <P>Ksh. 3,300/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%201%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKi0Mwm9p6cEed6aixHVp7uKvNbr5Ggo4xwI-uxgn0Xg&s=10" alt="ADIDAS CAMPUS">
+                    </div>
+                    <div class="product-info">
+                        <h3>ADIDAS CAMPUS</h3>
+                        <P>Ksh.3,300/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%203%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhrqvB8p0Vza2XRUpNYB6m1Fv-SvIv0rfSB25VKJ_pXg&s" alt="Jordan 11">
+                    </div>
+                    <div class="product-info">
+                        <h3ADIDAS CAMPUS</h3>
+                        <P>Ksh.3,300/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%2011%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+          </div>
+                </div>
+         <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSLUQ0hDr4sN_tIIXkbWs4EgcOdy5-YnCETw8XwW0KBQ&s=10" alt="ADIDAS CAMPUS">
+                    </div>
+                    <div class="product-info">
+                        <h3>ADIDAS CAMPUS</h3>
+                        <P>Ksh.3,300/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Air%20Jordan%2011%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- VANS SECTION -->
         <div class="category" id="vans">
             <h2>
@@ -593,7 +715,7 @@
                     </div>
                     <div class="product-info">
                         <h3>new era shirt</h3>
-                        <p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
+                        <p> Ksh. 2,000/=</p><p>TEXT US FOR MORE PRODUCTS DESIGNS & SIZES</p>
                         <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20Sports%20Cap%20from%20Plugged%20by%20Shayo.%20Please%20tell%20me%20about%20available%20colors%20and%20sizes." class="btn" target="_blank"><i class="fab fa-whatsapp" style="margin-right: 5px;"></i>Inquire on WhatsApp</a>
                     </div>
                 </div>
@@ -610,10 +732,10 @@
                 </div>
             </div>
         </div>
-        
-    </div>
- <!-- OFFICIAL SHOES -->
-        <div class="category" id="OFFICIAL SHOES">
+        </div>
+          
+           <!-- OFFICIAL SHOES -->
+        <div class="category" id="official-shoes">
             <h2>
                 
                 OFFICIAL SHOES
