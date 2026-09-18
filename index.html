@@ -27,7 +27,7 @@
         header {
             background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
             color: white;
-            padding: 20px 0;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -37,46 +37,111 @@
         
         .logo {
             position: absolute;
-            left:10px;
-            height: 70px;
+            left: 12px;
+            height: 52px;
             width: auto;
         }
         
         .logo img {
-            height: 150%;
+            height: 100%;
             width: auto;
             object-fit: contain;
         }
         
         .header-content {
             text-align: center;
+            width: min(760px, 100%);
         }
         
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.9em;
+            margin-bottom: 3px;
+            line-height: 1.15;
         }
         
         header p {
-            font-size: 1.1em;
+            font-size: 0.88em;
             opacity: 0.9;
+            margin: 2px 0;
+            line-height: 1.25;
+        }
+
+        .search-wrap {
+            width: min(520px, 100%);
+            margin: 9px auto 8px;
+            position: relative;
+        }
+
+        #product-search {
+            width: 100%;
+            border: none;
+            outline: none;
+            border-radius: 999px;
+            padding: 10px 42px 10px 40px;
+            font-size: 0.92em;
+            color: #172033;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.14);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1e40af;
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1em;
+            padding: 5px;
+            display: none;
+        }
+
+        .search-status {
+            display: none;
+            margin: 5px 0 0;
+            font-size: 0.78em;
+            opacity: 0.95;
+        }
+
+        .no-search-results {
+            display: none;
+            text-align: center;
+            padding: 28px 12px;
+            color: #64748b;
+            grid-column: 1 / -1;
         }
         
         nav {
             background: #1e40af;
-            padding: 10px 0;
+            padding: 7px 8px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
         }
         
         nav a {
             color: white;
             text-decoration: none;
-            margin: 0 20px;
+            margin: 0 11px;
+            font-size: 0.9em;
             font-weight: bold;
             transition: color 0.3s;
+            display: inline-block;
         }
         
         nav a:hover {
@@ -314,14 +379,48 @@
                 margin-bottom: 28px;
             }
 
+            header {
+                padding: 9px 8px 10px;
+            }
+
+            .logo {
+                display: none;
+            }
+
+            .header-content {
+                width: 100%;
+            }
+
+            header h1 {
+                font-size: 1.45em;
+                margin-bottom: 2px;
+            }
+
+            header p {
+                font-size: 0.7em;
+                margin: 1px 0;
+            }
+
+            .search-wrap {
+                margin: 7px auto 6px;
+            }
+
+            #product-search {
+                padding: 9px 38px 9px 36px;
+                font-size: 0.82em;
+            }
+
+            .search-icon {
+                left: 12px;
+            }
+
             nav {
-                overflow-x: auto;
-                white-space: nowrap;
+                padding: 6px 4px;
             }
 
             nav a {
-                margin: 0 7px;
-                font-size: 0.8em;
+                margin: 0 6px;
+                font-size: 0.72em;
             }
         }
     </style>
@@ -335,8 +434,17 @@
             <h1>Plugged by Shayo</h1>
             <p>Wear Your Vibe </p> <p><i>- Your one-stop shop for authentic sneakers, fits,sandals & new era caps -</i></p>
             <p>Premium quality sneakers, shoes & New era caps delivered to your door</p>
-        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20placing%20an%20order%20from%20Plugged%20by%20Shayo" class="whatsapp-btn" target="_blank">
-            <i class="fab fa-whatsapp whatsapp-icon"></i>Inquire via WhatsApp
+
+            <div class="search-wrap" role="search">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input id="product-search" type="search" placeholder="Search products, brands or categories..." aria-label="Search products, brands or categories" autocomplete="off">
+                <button type="button" id="search-clear" class="search-clear" aria-label="Clear product search" title="Clear search"><i class="fas fa-times"></i></button>
+                <div id="search-status" class="search-status" aria-live="polite"></div>
+            </div>
+
+            <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20placing%20an%20order%20from%20Plugged%20by%20Shayo" class="whatsapp-btn" target="_blank">
+                <i class="fab fa-whatsapp whatsapp-icon"></i>Inquire via WhatsApp
+            </a>
         </div>
     </header>
     
@@ -904,6 +1012,64 @@
             return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
         }
 
+        function filterProducts(searchTerm) {
+            const term = String(searchTerm || '').trim().toLowerCase();
+            const categories = document.querySelectorAll('.category');
+            let visibleCount = 0;
+
+            categories.forEach(category => {
+                const cards = category.querySelectorAll('.product-card');
+                if (!cards.length) return;
+
+                let categoryMatches = 0;
+                const categoryName = category.querySelector('h2')?.textContent.toLowerCase() || '';
+
+                cards.forEach(card => {
+                    const searchableText = `${card.textContent} ${categoryName} ${card.querySelector('img')?.alt || ''}`.toLowerCase();
+                    const matches = !term || searchableText.includes(term);
+                    card.style.display = matches ? '' : 'none';
+                    if (matches) {
+                        categoryMatches++;
+                        visibleCount++;
+                    }
+                });
+
+                category.style.display = categoryMatches > 0 ? '' : 'none';
+            });
+
+            const clearButton = document.getElementById('search-clear');
+            const status = document.getElementById('search-status');
+            if (clearButton) clearButton.style.display = term ? 'block' : 'none';
+            if (status) {
+                status.style.display = term ? 'block' : 'none';
+                status.textContent = term ? `${visibleCount} product${visibleCount === 1 ? '' : 's'} found` : '';
+            }
+
+            document.querySelectorAll('.no-search-results').forEach(el => el.remove());
+            if (term && visibleCount === 0) {
+                const liveSection = document.getElementById('live-products');
+                const message = document.createElement('div');
+                message.className = 'no-search-results';
+                message.style.display = 'block';
+                message.innerHTML = `<strong>No products found.</strong><br>Try another product name, brand or category.`;
+                if (liveSection) liveSection.parentNode.insertBefore(message, liveSection);
+                else document.querySelector('main')?.appendChild(message);
+            }
+        }
+
+        function setupProductSearch() {
+            const input = document.getElementById('product-search');
+            const clearButton = document.getElementById('search-clear');
+            if (!input) return;
+
+            input.addEventListener('input', () => filterProducts(input.value));
+            clearButton?.addEventListener('click', () => {
+                input.value = '';
+                input.focus();
+                filterProducts('');
+            });
+        }
+
         async function loadLiveProducts() {
             const { data, error } = await supabaseClient
                 .from('products')
@@ -916,7 +1082,11 @@
                 return;
             }
             renderLiveProducts(data || []);
+            const input = document.getElementById('product-search');
+            if (input?.value) filterProducts(input.value);
         }
+
+        setupProductSearch();
         loadLiveProducts();
     </script>
 
