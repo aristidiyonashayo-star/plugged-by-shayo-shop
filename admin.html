@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plugged by Shayo — Owner Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#222}header{background:linear-gradient(135deg,#1e40af,#0ea5e9);color:#fff;padding:22px 16px;text-align:center}main{max-width:900px;margin:auto;padding:18px}.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 3px 14px rgba(0,0,0,.08)}h1,h2{margin-top:0}.hidden{display:none}.field{margin-bottom:12px}label{display:block;font-weight:700;margin-bottom:6px}input,textarea,select{width:100%;padding:12px;border:1px solid #d4d9e2;border-radius:9px;font-size:16px}textarea{min-height:90px;resize:vertical}button{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;background:#1e40af;color:#fff}button.secondary{background:#64748b}button.danger{background:#dc2626}button.green{background:#16a34a}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1}.product{display:grid;grid-template-columns:90px 1fr auto;gap:12px;align-items:center;border-top:1px solid #eee;padding:12px 0}.product img{width:90px;height:90px;object-fit:cover;border-radius:9px;background:#eee}.muted{color:#64748b;font-size:14px}.error{color:#b91c1c}.success{color:#15803d}.preview{max-width:130px;max-height:130px;border-radius:10px;display:none;margin-top:8px}@media(max-width:600px){.product{grid-template-columns:70px 1fr}.product img{width:70px;height:70px}.product-actions{grid-column:1/-1}.product-actions button{margin-right:6px}}
+</style>
+</head>
+<body>
+<header><h1>PLUGGED BY SHAYO</h1><p>Owner Product Panel</p></header>
+<main>
+<section id="loginCard" class="card">
+<h2>Owner Login</h2>
+<p class="muted">Use the owner account you created in Supabase Authentication.</p>
+<form id="loginForm">
+<div class="field"><label>Email</label><input id="email" type="email" required autocomplete="username"></div>
+<div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password"></div>
+<button type="submit">Login</button>
+<p id="loginMsg" class="error"></p>
+</form>
+</section>
+
+<section id="panel" class="hidden">
+<div class="card">
+<div class="row" style="align-items:center"><div><h2>Add / Edit Product</h2><p class="muted">Upload a photo from your phone and publish it directly to the website.</p></div><div style="text-align:right"><button id="logoutBtn" class="secondary">Log out</button></div></div>
+<form id="productForm">
+<input id="productId" type="hidden">
+<div class="field"><label>Product photo</label><input id="image" type="file" accept="image/*"><img id="preview" class="preview" alt="Preview"></div>
+<div class="field"><label>Product name</label><input id="name" maxlength="100" required placeholder="e.g. Air Jordan 4"></div>
+<div class="row"><div class="field"><label>Price (Ksh)</label><input id="price" type="number" min="0" step="1" required placeholder="3800"></div><div class="field"><label>Category</label><input id="category" maxlength="50" required placeholder="Jordans"></div></div>
+<div class="field"><label>Description / sizes</label><textarea id="description" placeholder="Available sizes 39–44, black and white..."></textarea></div>
+<div class="row"><button type="submit" class="green">Save & Publish</button><button type="button" id="cancelEdit" class="secondary">Clear</button></div>
+<p id="formMsg"></p>
+</form>
+</div>
+
+<div class="card"><h2>Products</h2><p class="muted">Products marked active are visible on the public website.</p><div id="productsList">Loading...</div></div>
+</section>
+</main>
+<script>
+const SUPABASE_URL='https://rgxnqvxmtdwvfydetkzh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentUser=null;
+let currentImageUrl='';
+
+const $=id=>document.getElementById(id);
+function msg(el,text,ok=false){el.textContent=text;el.className=ok?'success':'error'}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function money(v){return 'Ksh. '+Number(v).toLocaleString('en-KE')+'/='}
+
+async function checkSession(){
+ const {data:{session}}=await db.auth.getSession();
+ if(session){currentUser=session.user; showPanel();} else showLogin();
+}
+function showLogin(){$('loginCard').classList.remove('hidden');$('panel').classList.add('hidden')}
+function showPanel(){$('loginCard').classList.add('hidden');$('panel').classList.remove('hidden');loadProducts()}
+
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();msg($('loginMsg'),'Logging in...');
+ const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+ if(error){msg($('loginMsg'),error.message);return}
+ currentUser=data.user;msg($('loginMsg'),'Logged in',true);showPanel();
+});
+$('logoutBtn').onclick=async()=>{await db.auth.signOut();showLogin()};
+$('cancelEdit').onclick=clearForm;
+$('image').addEventListener('change',()=>{const f=$('image').files[0];if(!f)return;$('preview').src=URL.createObjectURL(f);$('preview').style.display='block'});
+
+async function uploadImage(file){
+ const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const path=currentUser.id+'/'+crypto.randomUUID()+'.'+(ext||'jpg');
+ const {error}=await db.storage.from('product-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||'image/jpeg'});
+ if(error)throw error;
+ const {data}=db.storage.from('product-images').getPublicUrl(path);
+ return data.publicUrl;
+}
+
+$('productForm').addEventListener('submit',async e=>{
+ e.preventDefault();msg($('formMsg'),'Saving...');
+ try{
+  const id=$('productId').value;
+  let imageUrl=currentImageUrl;
+  const file=$('image').files[0];
+  if(file) imageUrl=await uploadImage(file);
+  const payload={name:$('name').value.trim(),price:Number($('price').value),category:$('category').value.trim(),description:$('description').value.trim(),image_url:imageUrl,active:true};
+  let result;
+  if(id) result=await db.from('products').update(payload).eq('id',id); else result=await db.from('products').insert(payload);
+  if(result.error)throw result.error;
+  msg($('formMsg'),'Product published successfully.',true);clearForm();loadProducts();
+ }catch(err){console.error(err);msg($('formMsg'),err.message||'Could not save product.')}
+});
+
+async function loadProducts(){
+ const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
+ if(error){$('productsList').innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
+ if(!data.length){$('productsList').innerHTML='<p class="muted">No products yet.</p>';return}
+ $('productsList').innerHTML=data.map(p=>`<div class="product"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}"><div><strong>${esc(p.name)}</strong><br>${money(p.price)}<br><span class="muted">${esc(p.category)}${p.active?'':' — hidden'}</span></div><div class="product-actions"><button onclick="editProduct('${p.id}')">Edit</button> <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button></div></div>`).join('');
+}
+
+window.editProduct=async id=>{const {data,error}=await db.from('products').select('*').eq('id',id).single();if(error){alert(error.message);return}$('productId').value=data.id;$('name').value=data.name;$('price').value=data.price;$('category').value=data.category;$('description').value=data.description||'';currentImageUrl=data.image_url||'';$('image').value='';if(currentImageUrl){$('preview').src=currentImageUrl;$('preview').style.display='block'}window.scrollTo({top:0,behavior:'smooth'});};
+window.deleteProduct=async id=>{if(!confirm('Delete this product?'))return;const {error}=await db.from('products').delete().eq('id',id);if(error){alert(error.message);return}loadProducts()};
+function clearForm(){$('productForm').reset();$('productId').value='';currentImageUrl='';$('preview').style.display='none';$('formMsg').textContent=''}
+
+db.auth.onAuthStateChange((_event,session)=>{if(session){currentUser=session.user;showPanel()}else{currentUser=null;showLogin()}});
+checkSession();
+</script>
+</body>
+</html>

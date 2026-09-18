@@ -6,7 +6,7 @@
     <title>Plugged by Shayo</title>
     
     <!-- Favicon link element (ICO format) -->
-    <link rel="icon" type="C:\Users\HP\Downloads\favicon.ico" href="favicon.ico">
+    <link rel="icon" href="favicon.ico">
     <!-- Font Awesome for WhatsApp Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -839,12 +839,24 @@
     </div>
 
     
+
+    <!-- PRODUCTS FROM SUPABASE -->
+    <section id="live-products" class="container" style="padding-top:0;">
+        <div class="category">
+            <h2><span class="category-icon">🛍️</span>Latest Products</h2>
+            <div id="supabase-products" class="products-grid">
+                <p style="text-align:center;grid-column:1/-1;color:#666;">Loading latest products...</p>
+            </div>
+        </div>
+    </section>
+
     <footer>
         <p>&copy; 2026 Plugged by Shayo. All rights reserved.</p>
         <p>
             WhatsApp: <a href="https://wa.me/254112958414" target="_blank" style="color: #e0f2fe; text-decoration: none;"><i class="fab fa-whatsapp"></i> +254112958414</a> | 
             Instagram: <a href="https://www.instagram.com/plugged__by__.shayo?stkn=MWV5OWlueHc1NHd2Nw==" target="_blank" style="color: #e0f2fe; text-decoration: none;"><i class="fab fa-instagram"></i> @plugged__by__.shayo</a> | 
             Email: info@pluggedbyshayo.com
+            <br><a href="admin.html" style="color:#e0f2fe;text-decoration:none;">Owner Login</a>
         </p>
     </footer>
     
@@ -852,5 +864,61 @@
     <a href="https://wa.me/254112958414" class="whatsapp-float" target="_blank" title="Chat with us on WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://rgxnqvxmtdwvfydetkzh.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        const SHOP_WHATSAPP = '254112958414';
+
+        function money(value) {
+            return 'Ksh. ' + Number(value).toLocaleString('en-KE') + '/=';
+        }
+
+        function renderLiveProducts(products) {
+            const root = document.getElementById('supabase-products');
+            if (!products.length) {
+                root.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:#666;">No new products have been added yet.</p>';
+                return;
+            }
+            root.innerHTML = products.map(product => {
+                const text = `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
+                const wa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(text)}`;
+                return `
+                    <div class="product-card">
+                        <div class="product-image">
+                            ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(product.name)}" loading="lazy">` : '<span>No image</span>'}
+                        </div>
+                        <div class="product-info">
+                            <h3>${escapeHtml(product.name)}</h3>
+                            <p><strong>${money(product.price)}</strong></p>
+                            ${product.description ? `<p>${escapeHtml(product.description)}</p>` : ''}
+                            <a href="${wa}" class="btn" target="_blank" rel="noopener"><i class="fab fa-whatsapp" style="margin-right:5px;"></i>Inquire on WhatsApp</a>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+        }
+
+        async function loadLiveProducts() {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('id,name,price,category,description,image_url,created_at')
+                .eq('active', true)
+                .order('created_at', { ascending: false });
+            if (error) {
+                console.error('Could not load Supabase products:', error);
+                document.getElementById('supabase-products').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:#b91c1c;">Products are temporarily unavailable. Please try again later.</p>';
+                return;
+            }
+            renderLiveProducts(data || []);
+        }
+        loadLiveProducts();
+    </script>
+
 </body>
 </html>
