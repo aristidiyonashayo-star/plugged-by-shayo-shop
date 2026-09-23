@@ -31,7 +31,23 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-        
+      
+<!--COMPUTER--> 
+body {
+    background-size: cover;
+    background-position: center center;
+}
+
+<!--PHONE--> 
+@media (max-width: 768px) {
+    body {
+        background-size: 100% auto;
+        background-position: top center;
+        background-attachment: scroll;
+        background-repeat: repeat-y;
+    }
+}
+
         header {
             background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
             color: white;
