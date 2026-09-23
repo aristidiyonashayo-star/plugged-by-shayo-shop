@@ -250,6 +250,14 @@
         .btn:hover {
             background: #0ea5e9;
         }
+        .order-btn {
+    background: #000000;
+    margin-top: 8px;
+}
+
+.order-btn:hover {
+    background: #000000;
+}
         
         footer {
             background: #1e40af;
@@ -456,17 +464,61 @@
     
     
     <nav>
-        <a href="#nike">Nike</a>
-        <a href="#jordan">Jordans</a>
-        <a href="#vans">Vans</a>
-        <a href="#newbalance">New Balance</a>
-        <a href="#airforce">Air Force</a>
-        <a href="#REEBOK,PUMA,AND OTHER BRANDS">Official Shoes</a>
-        <a href="#sandals">sandals</a>
-        <a href="#new eras">New era caps&shirts</a>
-        <a href="#Adidas">Official Shoes</a>
+       <nav aria-label="Product categories">
+    <a href="#" onclick="searchCategory(''); return false;">Shop</a>
+
+    <a href="#" onclick="searchCategory('Nike'); return false;">
+        Nike
+    </a>
+
+    <a href="#" onclick="searchCategory('Jordan'); return false;">
+        Jordans
+    </a>
+
+    <a href="#" onclick="searchCategory('Vans'); return false;">
+        Vans
+    </a>
+
+    <a href="#" onclick="searchCategory('New Balance'); return false;">
+        New Balance
+    </a>
+
+    </a>
+
+    <a href="#" onclick="searchCategory('Airforce'); return false;">
+        Airforce
+    </a>
+
+    <a href="#" onclick="searchCategory('Airmax'); return false;">
+        Air Max
+    </a>
+
+    <a href="#" onclick="searchCategory('Samba'); return false;">
+        Samba
+    </a>
+
+    <a href="#" onclick="searchCategory('Converse'); return false;">
+        CONVERSE
+    </a>
+
+    <a href="#" onclick="searchCategory('slides'); return false;">
+        Sandals
+    </a>
+
+    <a href="#" onclick="searchCategory('Puma'); return false;">
+        Puma
+    </a>
+
+    <a href="#" onclick="searchCategory('New era'); return false;">
+        New Era Caps & Shirts
+    </a>
+
+    <a href="#" onclick="searchCategory('Adidas'); return false;">
+        Adidas
+    </a></nav>
+</nav>
         
-    </nav>
+    
     
     <div class="container">
         
@@ -520,7 +572,16 @@
             }
             root.innerHTML = products.map(product => {
                 const text = `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
-                const wa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(text)}`;
+const wa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(text)}`;
+
+const orderText = `Hi! I want to ORDER this product from Plugged by Shayo.
+
+Product: ${product.name}
+Price: ${money(product.price)}
+Product image: ${product.image_url || 'No image available'}
+
+Please help me with the order.`;
+const orderWa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(orderText)}`;
                 return `
                     <div class="product-card">
                         <div class="product-image">
@@ -530,7 +591,15 @@
                             <h3>${escapeHtml(product.name)}</h3>
                             <p><strong>${money(product.price)}</strong></p>
                             ${product.description ? `<p>${escapeHtml(product.description)}</p>` : ''}
-                            <a href="${wa}" class="btn" target="_blank" rel="noopener"><i class="fab fa-whatsapp" style="margin-right:5px;"></i>Inquire on WhatsApp</a>
+                            <a href="${wa}" class="btn" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp" style="margin-right:5px;"></i>
+    Inquire on WhatsApp
+</a>
+
+<a href="${orderWa}" class="btn order-btn" target="_blank" rel="noopener">
+    <i class="fas fa-shopping-cart" style="margin-right:5px;"></i>
+    Order on WhatsApp
+</a>
                         </div>
                     </div>`;
             }).join('');
@@ -539,7 +608,27 @@
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
         }
+function searchCategory(category) {
+    const input = document.getElementById('product-search');
 
+    if (!input) return;
+
+    // Put the category into the search bar
+    input.value = category;
+
+    // Filter the products
+    filterProducts(category);
+
+    // Scroll to products
+    const productsSection = document.getElementById('live-products');
+
+    if (productsSection) {
+        productsSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
         function filterProducts(searchTerm) {
             const term = String(searchTerm || '').trim().toLowerCase();
             const categories = document.querySelectorAll('.category');
