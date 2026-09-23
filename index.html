@@ -31,7 +31,14 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-      
+      @media (max-width: 768px) {
+    body {
+        background-size: 100% auto;
+        background-position: top center;
+        background-attachment: scroll;
+        background-repeat: repeat-y;
+    }
+}
 <!--COMPUTER--> 
 body {
     background-size: cover;
