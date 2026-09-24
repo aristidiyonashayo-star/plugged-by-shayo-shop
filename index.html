@@ -34,12 +34,74 @@ body {
 }
 
 /* PHONE */
-@media (max-width: 768px) {
-    body {
-        background-size: 100% auto;
-        background-position: top center;
-        background-attachment: scroll;
-        background-repeat: repeat-y;
+@media (max-width: 600px) {
+
+    .products-grid {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 5px 4px 15px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .products-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .products-grid .product-card {
+        flex: 0 0 31%;
+        width: 31%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .products-grid .product-card img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        display: block;
+    }
+
+    .products-grid .product-info {
+        padding: 8px 5px;
+    }
+
+    .products-grid .product-info h3 {
+        font-size: 13px;
+        line-height: 1.25;
+        margin: 4px 0;
+    }
+
+    .products-grid .product-info p {
+        font-size: 11px;
+        line-height: 1.3;
+        margin: 4px 0;
+    }
+
+    .products-grid .product-price {
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .products-grid .product-actions {
+        gap: 5px;
+        margin-top: 7px;
+    }
+
+    .products-grid .product-actions a {
+        min-height: 34px;
+        padding: 6px 4px;
+        font-size: 10px;
+        line-height: 1.1;
+        border-radius: 5px;
+    }
+
+    .category-scroll-btn {
+        display: none;
     }
 }
 
