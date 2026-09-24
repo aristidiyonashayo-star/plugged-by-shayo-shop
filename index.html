@@ -193,11 +193,57 @@ body {
             min-width: 50px;
         }
         
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-        }
+        /* HORIZONTAL PRODUCT ROWS */
+.products-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 5px 3px 15px;
+    position: relative;
+}
+
+.products-grid::-webkit-scrollbar {
+    display: none;
+}
+
+/* Each product keeps its size instead of shrinking */
+.products-grid .product-card {
+    flex: 0 0 240px;
+    width: 240px;
+}
+
+/* Wrapper around each product row */
+.products-row-wrapper {
+    position: relative;
+}
+
+/* PC horizontal scroll button */
+.category-scroll-btn {
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #1e40af;
+    color: white;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.category-scroll-btn:hover {
+    background: #0ea5e9;
+}
         
         .product-card {
             background: white;
@@ -271,6 +317,49 @@ body {
 
 .order-btn:hover {
     background: #000000;
+}
+/* PRODUCT BUTTONS */
+.product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.product-actions .whatsapp-btn,
+.product-actions .order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* Blue inquire button */
+.product-actions .whatsapp-btn {
+    background: #253fd3;
+    color: white;
+}
+
+/* Black order button */
+.product-actions .order-btn {
+    background: #000000;
+    color: white;
+}
+
+/* Keep the writing white */
+.product-actions .order-btn,
+.product-actions .order-btn:visited,
+.product-actions .order-btn:hover {
+    color: white;
 }
         
         footer {
@@ -358,31 +447,30 @@ body {
             }
 
             .products-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 7px;
-            }
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 3px 2px 12px;
+    -webkit-overflow-scrolling: touch;
+}
 
-            .product-card {
-                border-radius: 6px;
-            }
+.products-grid::-webkit-scrollbar {
+    display: none;
+}
 
-            .product-image {
-                height: 105px;
-            }
+/* Exactly about 3 products visible on phone */
+.products-grid .product-card {
+    flex: 0 0 calc((100% - 14px) / 3);
+    width: calc((100% - 14px) / 3);
+}
 
-            .product-info {
-                padding: 7px 3px;
-            }
-
-            .product-info h3 {
-                font-size: 0.72em;
-                margin-bottom: 4px;
-            }
-
-            .product-info p {
-                font-size: 0.62em;
-                margin-bottom: 6px;
-            }
+/* Hide PC arrow on phones */
+.category-scroll-btn {
+    display: none;
+}
 
             .btn {
                 padding: 5px 4px;
@@ -523,8 +611,19 @@ body {
         Puma
     </a>
 
-    <a href="#" onclick="searchCategory('New era'); return false;">
-        New Era Caps & Shirts
+    <a href="#" onclick="searchCategory('ASICS'); return false;">
+       ASICS
+    </a>
+
+    <a href="#" onclick="searchCategory('Dr martens boots'); return false;">
+        Dr martens boots
+
+    <a href="#" onclick="searchCategory('Timberland'); return false;">
+        Timberland
+    </a>
+
+    <a href="#" onclick="searchCategory('Numeris'); return false;">
+        Numeris
     </a>
 
     <a href="#" onclick="searchCategory('Adidas'); return false;">
@@ -532,6 +631,10 @@ body {
     </a>
 <a href="#" onclick="searchCategory('Clark’s'); return false;">
         clarks
+    </a>
+    </a>
+<a href="#" onclick="searchCategory('Other Brands'); return false;">
+        Other Brands
     </a>
 </nav>
 </nav>
@@ -548,13 +651,12 @@ body {
 
     <!-- PRODUCTS FROM SUPABASE -->
     <section id="live-products" class="container" style="padding-top:0;">
-        <div class="category">
-            <h2><span class="category-icon"></span>Latest Products</h2>
-            <div id="supabase-products" class="products-grid">
-                <p style="text-align:center;grid-column:1/-1;color:#666;">Loading latest products...</p>
-            </div>
-        </div>
-    </section>
+    <div id="supabase-products">
+        <p style="text-align:center;color:#666;">
+            Loading products...
+        </p>
+    </div>
+</section>
 
     <footer>
         <p>&copy; 2026 Plugged by Shayo. All rights reserved.</p>
@@ -573,157 +675,758 @@ body {
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://rgxnqvxmtdwvfydetkzh.supabase.co';
-        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        const SHOP_WHATSAPP = '254112958414';
+const SUPABASE_URL = 'https://rgxnqvxmtdwvfydetkzh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
 
-        function money(value) {
-            return 'Ksh. ' + Number(value).toLocaleString('en-KE') + '/=';
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+const SHOP_WHATSAPP = '254112958414';
+
+function money(value) {
+    return 'Ksh. ' + Number(value).toLocaleString('en-KE') + '/=';
+}
+
+
+/* =========================================
+   CATEGORY CONFIGURATION
+========================================= */
+
+const CATEGORY_CONFIG = [
+    { key: 'Nike', title: 'Nike', icon: '' },
+    { key: 'Jordan', title: 'Jordans', icon: '' },
+    { key: 'Vans', title: 'Vans', icon: '' },
+    { key: 'New Balance', title: 'New Balance', icon: '' },
+    { key: 'Airforce', title: 'Airforce', icon: '' },
+    { key: 'Airmax', title: 'Air Max', icon: '' },
+    { key: 'Samba', title: 'Samba', icon: '' },
+    { key: 'Converse', title: 'Converse', icon: '' },
+    { key: 'slides', title: 'Sandals', icon: '' },
+    { key: 'Puma', title: 'Puma', icon: '' },
+    { key: 'Timberland', title: 'Timberland', icon: '' },
+    { key: 'ASICS', title: 'ASICS', icon: '' },
+    { key: 'Numeris', title: 'Numeris', icon: '' },
+    { key: 'Dr martens boots', title: 'Dr martens boots', icon: '' },
+    { key: 'Clark', title: 'Clarks', icon: '' }
+];
+
+
+/* =========================================
+   DETERMINE PRODUCT CATEGORY
+========================================= */
+
+function getProductCategory(productCategory) {
+
+    const category = String(productCategory || '')
+        .toLowerCase()
+        .trim();
+
+    if (category.includes('nike')) return 'Nike';
+
+    if (category.includes('jordan')) return 'Jordan';
+
+    if (category.includes('vans')) return 'Vans';
+
+    if (
+        category.includes('new balance') ||
+        category.includes('newbalance')
+    ) {
+        return 'New Balance';
+    }
+
+    if (
+        category.includes('airforce') ||
+        category.includes('air force')
+    ) {
+        return 'Airforce';
+    }
+
+if (
+        category.includes('ASICS') ||
+        category.includes('ASICS')
+    ) {
+        return 'ASICS';
+    }
+
+    if (
+        category.includes('Timberland') ||
+        category.includes('Timberland')
+    ) {
+        return 'Timberland';
+    }
+
+    if (
+        category.includes('Dr martens boots') ||
+        category.includes('Dr martens boots')
+    ) {
+        return 'Dr martens boots';
+    }
+
+    if (
+        category.includes('Numeris') ||
+        category.includes('Numeris')
+    ) {
+        return 'Numeris';
+    }
+
+
+    if (
+        category.includes('airmax') ||
+        category.includes('air max')
+    ) {
+        return 'Airmax';
+    }
+
+    if (category.includes('samba')) return 'Samba';
+
+    if (category.includes('converse')) return 'Converse';
+
+    if (
+        category.includes('slide') ||
+        category.includes('sandals') ||
+        category.includes('sandal')
+    ) {
+        return 'slides';
+    }
+
+    if (category.includes('puma')) return 'Puma';
+
+    if (
+        category.includes('new era') ||
+        category.includes('newera')
+    ) {
+        return 'New era';
+    }
+
+    if (category.includes('adidas')) return 'Adidas';
+
+    if (
+        category.includes('clark') ||
+        category.includes('clarks')
+    ) {
+        return 'Clark';
+    }
+
+    return 'Other Brands';
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(
+        /[&<>'"]/g,
+        c => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[c])
+    );
+}
+
+
+/* =========================================
+   CREATE PRODUCT CARD
+========================================= */
+
+function createProductCard(product) {
+
+    // INQUIRE BUTTON
+    const inquireText =
+        `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
+
+    const inquireWa =
+        `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(inquireText)}`;
+
+
+    // ORDER BUTTON
+    const orderText =
+        `Hello! I would like to order this product from Plugged by Shayo.\n\n` +
+        `Product: ${product.name}\n` +
+        `Price: ${money(product.price)}\n` +
+        `Image: ${product.image_url || 'No image available'}`;
+
+    const orderWa =
+        `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(orderText)}`;
+
+
+    return `
+        <div class="product-card">
+
+            <div class="product-image">
+                ${product.image_url
+                    ? `<img src="${product.image_url}" alt="${escapeHtml(product.name)}">`
+                    : ''
+                }
+            </div>
+
+            <div class="product-info">
+
+                <h3>${escapeHtml(product.name)}</h3>
+
+                <p>${escapeHtml(product.description || '')}</p>
+
+                <div class="product-price">
+                    ${money(product.price)}
+                </div>
+
+                <div class="product-actions">
+
+                    <a href="${inquireWa}"
+                       target="_blank"
+                       rel="noopener"
+                       class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        Inquire about product
+                    </a>
+
+                    <a href="${orderWa}"
+                       target="_blank"
+                       rel="noopener"
+                       class="order-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        Order this product
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================================
+   RENDER PRODUCTS BY CATEGORY
+========================================= */
+
+function renderLiveProducts(products) {
+
+    const root =
+        document.getElementById('supabase-products');
+
+    if (!root) return;
+
+    if (!products || !products.length) {
+
+        root.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#666;
+                padding:30px;
+            ">
+                No products available at the moment.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    const grouped = {};
+
+
+    CATEGORY_CONFIG.forEach(category => {
+        grouped[category.key] = [];
+    });
+
+
+    grouped['Other Brands'] = [];
+
+
+    products.forEach(product => {
+
+        const category =
+            getProductCategory(product.category);
+
+        if (grouped[category]) {
+            grouped[category].push(product);
+        } else {
+            grouped['Other Brands'].push(product);
         }
 
-        function renderLiveProducts(products) {
-            const root = document.getElementById('supabase-products');
-            if (!products.length) {
-                root.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:#666;">No new products have been added yet.</p>';
-                return;
-            }
-            root.innerHTML = products.map(product => {
-                const text = `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
-const wa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(text)}`;
+    });
 
-const orderText = `Hi! I want to ORDER this product from Plugged by Shayo.
 
-Product: ${product.name}
-Price: ${money(product.price)}
-Product image: ${product.image_url || 'No image available'}
+    let html = '';
 
-Please help me with the order.`;
-const orderWa = `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(orderText)}`;
-                return `
-                    <div class="product-card">
-                        <div class="product-image">
-                            ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(product.name)}" loading="lazy">` : '<span>No image</span>'}
-                        </div>
-                        <div class="product-info">
-                            <h3>${escapeHtml(product.name)}</h3>
-                            <p><strong>${money(product.price)}</strong></p>
-                            ${product.description ? `<p>${escapeHtml(product.description)}</p>` : ''}
-                            <a href="${wa}" class="btn" target="_blank" rel="noopener">
-    <i class="fab fa-whatsapp" style="margin-right:5px;"></i>
-    Inquire about product
-</a>
 
-<a href="${orderWa}" class="btn order-btn" target="_blank" rel="noopener">
-    <i class="fas fa-shopping-cart" style="margin-right:5px;"></i>
-    Order this product
-</a>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
+    /* NORMAL CATEGORIES */
 
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-        }
+    CATEGORY_CONFIG.forEach(category => {
+
+        const categoryProducts =
+            grouped[category.key];
+
+        if (!categoryProducts.length) return;
+
+
+        const sectionId =
+            'category-' +
+            category.key
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-');
+
+
+        html += `
+            <section
+                class="category"
+                id="${sectionId}"
+            >
+
+                <h2>
+
+                    <span class="category-icon">
+                        ${category.icon}
+                    </span>
+
+                    ${escapeHtml(category.title)}
+
+                </h2>
+
+
+                <div class="products-row-wrapper">
+
+                    <div class="products-grid">
+
+                        ${categoryProducts
+                            .map(createProductCard)
+                            .join('')}
+
+                    </div>
+
+
+                    <button
+                        class="category-scroll-btn"
+                        type="button"
+                        onclick="scrollCategory('${sectionId}')"
+                        aria-label="See more ${escapeHtml(category.title)} products"
+                    >
+
+                        <i class="fas fa-chevron-right"></i>
+
+                    </button>
+
+                </div>
+
+            </section>
+        `;
+    });
+
+
+    /* OTHER BRANDS */
+
+    if (grouped['Other Brands'].length) {
+
+        html += `
+            <section
+                class="category"
+                id="category-other-brands"
+            >
+
+                <h2>
+
+                    <span class="category-icon">
+                        
+                    </span>
+
+                    Other Brands
+
+                </h2>
+
+
+                <div class="products-row-wrapper">
+
+                    <div class="products-grid">
+
+                        ${grouped['Other Brands']
+                            .map(createProductCard)
+                            .join('')}
+
+                    </div>
+
+
+                    <button
+                        class="category-scroll-btn"
+                        type="button"
+                        onclick="scrollCategory('category-other-brands')"
+                        aria-label="See more Other Brands products"
+                    >
+
+                        <i class="fas fa-chevron-right"></i>
+
+                    </button>
+
+                </div>
+
+            </section>
+        `;
+    }
+
+
+    root.innerHTML = html;
+}
+
+
+/* =========================================
+   PC SCROLL BUTTON
+========================================= */
+
+function scrollCategory(sectionId) {
+
+    const section =
+        document.getElementById(sectionId);
+
+    if (!section) return;
+
+
+    const row =
+        section.querySelector('.products-grid');
+
+    if (!row) return;
+
+
+    row.scrollBy({
+        left: row.clientWidth * 0.75,
+        behavior: 'smooth'
+    });
+}
+
+
+/* =========================================
+   NAVIGATION CATEGORY
+========================================= */
+
 function searchCategory(category) {
-    const input = document.getElementById('product-search');
+
+    const input =
+        document.getElementById('product-search');
 
     if (!input) return;
 
-    // Put the category into the search bar
+
+    /* HOME */
+
+    if (!category) {
+
+        input.value = '';
+
+        filterProducts('');
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        return;
+    }
+
+
     input.value = category;
 
-    // Filter the products
     filterProducts(category);
 
-    // Scroll to products
-    const productsSection = document.getElementById('live-products');
 
-    if (productsSection) {
-        productsSection.scrollIntoView({
+    const config =
+        CATEGORY_CONFIG.find(item =>
+            item.key.toLowerCase() ===
+            category.toLowerCase()
+        );
+
+
+    let sectionId = '';
+
+
+    if (config) {
+
+        sectionId =
+            'category-' +
+            config.key
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-');
+
+    }
+
+
+    if (!sectionId) {
+        sectionId = 'category-other-brands';
+    }
+
+
+    const section =
+        document.getElementById(sectionId);
+
+
+    if (section) {
+
+        section.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
         });
+
     }
 }
-        function filterProducts(searchTerm) {
-            const term = String(searchTerm || '').trim().toLowerCase();
-            const categories = document.querySelectorAll('.category');
-            let visibleCount = 0;
 
-            categories.forEach(category => {
-                const cards = category.querySelectorAll('.product-card');
-                if (!cards.length) return;
 
-                let categoryMatches = 0;
-                const categoryName = category.querySelector('h2')?.textContent.toLowerCase() || '';
+/* =========================================
+   SEARCH FILTER
+========================================= */
 
-                cards.forEach(card => {
-                    const searchableText = `${card.textContent} ${categoryName} ${card.querySelector('img')?.alt || ''}`.toLowerCase();
-                    const matches = !term || searchableText.includes(term);
-                    card.style.display = matches ? '' : 'none';
-                    if (matches) {
-                        categoryMatches++;
-                        visibleCount++;
-                    }
-                });
+function filterProducts(searchTerm) {
 
-                category.style.display = categoryMatches > 0 ? '' : 'none';
-            });
+    const term =
+        String(searchTerm || '')
+            .trim()
+            .toLowerCase();
 
-            const clearButton = document.getElementById('search-clear');
-            const status = document.getElementById('search-status');
-            if (clearButton) clearButton.style.display = term ? 'block' : 'none';
-            if (status) {
-                status.style.display = term ? 'block' : 'none';
-                status.textContent = term ? `${visibleCount} product${visibleCount === 1 ? '' : 's'} found` : '';
+
+    const categories =
+        document.querySelectorAll('.category');
+
+
+    let visibleCount = 0;
+
+
+    categories.forEach(category => {
+
+        const cards =
+            category.querySelectorAll('.product-card');
+
+        if (!cards.length) return;
+
+
+        let categoryMatches = 0;
+
+
+        const categoryName =
+            category.querySelector('h2')
+                ?.textContent
+                .toLowerCase() || '';
+
+
+        cards.forEach(card => {
+
+            const searchableText =
+                `${card.textContent} ${categoryName} ${
+                    card.querySelector('img')?.alt || ''
+                }`.toLowerCase();
+
+
+            const matches =
+                !term ||
+                searchableText.includes(term);
+
+
+            card.style.display =
+                matches ? '' : 'none';
+
+
+            if (matches) {
+
+                categoryMatches++;
+                visibleCount++;
+
             }
 
-            document.querySelectorAll('.no-search-results').forEach(el => el.remove());
-            if (term && visibleCount === 0) {
-                const liveSection = document.getElementById('live-products');
-                const message = document.createElement('div');
-                message.className = 'no-search-results';
-                message.style.display = 'block';
-                message.innerHTML = `<strong>No products found.</strong><br>Try another product name, brand or category.`;
-                if (liveSection) liveSection.parentNode.insertBefore(message, liveSection);
-                else document.querySelector('main')?.appendChild(message);
-            }
+        });
+
+
+        category.style.display =
+            categoryMatches > 0 ? '' : 'none';
+
+    });
+
+
+    const clearButton =
+        document.getElementById('search-clear');
+
+    const status =
+        document.getElementById('search-status');
+
+
+    if (clearButton) {
+
+        clearButton.style.display =
+            term ? 'block' : 'none';
+
+    }
+
+
+    if (status) {
+
+        status.style.display =
+            term ? 'block' : 'none';
+
+        status.textContent =
+            term
+                ? `${visibleCount} product${
+                    visibleCount === 1 ? '' : 's'
+                  } found`
+                : '';
+
+    }
+
+
+    document
+        .querySelectorAll('.no-search-results')
+        .forEach(el => el.remove());
+
+
+    if (term && visibleCount === 0) {
+
+        const liveSection =
+            document.getElementById('live-products');
+
+
+        const message =
+            document.createElement('div');
+
+
+        message.className =
+            'no-search-results';
+
+
+        message.style.display =
+            'block';
+
+
+        message.innerHTML = `
+            <strong>No products found.</strong>
+            <br>
+            Try another product name, brand or category.
+        `;
+
+
+        if (liveSection) {
+
+            liveSection.parentNode.insertBefore(
+                message,
+                liveSection
+            );
+
         }
 
-        function setupProductSearch() {
-            const input = document.getElementById('product-search');
-            const clearButton = document.getElementById('search-clear');
-            if (!input) return;
+    }
 
-            input.addEventListener('input', () => filterProducts(input.value));
-            clearButton?.addEventListener('click', () => {
-                input.value = '';
-                input.focus();
-                filterProducts('');
-            });
+}
+
+
+/* =========================================
+   SEARCH SETUP
+========================================= */
+
+function setupProductSearch() {
+
+    const input =
+        document.getElementById('product-search');
+
+    const clearButton =
+        document.getElementById('search-clear');
+
+
+    if (!input) return;
+
+
+    input.addEventListener('input', () => {
+
+        filterProducts(input.value);
+
+    });
+
+
+    clearButton?.addEventListener('click', () => {
+
+        input.value = '';
+
+        input.focus();
+
+        filterProducts('');
+
+    });
+
+}
+
+
+/* =========================================
+   LOAD PRODUCTS FROM SUPABASE
+========================================= */
+
+async function loadLiveProducts() {
+
+    const { data, error } =
+        await supabaseClient
+            .from('products')
+            .select(
+                'id,name,price,category,description,image_url,created_at'
+            )
+            .eq('active', true)
+            .order(
+                'created_at',
+                { ascending: false }
+            );
+
+
+    if (error) {
+
+        console.error(
+            'Could not load Supabase products:',
+            error
+        );
+
+
+        const root =
+            document.getElementById('supabase-products');
+
+
+        if (root) {
+
+            root.innerHTML = `
+                <p style="
+                    text-align:center;
+                    color:#b91c1c;
+                    padding:30px;
+                ">
+                    Products are temporarily unavailable.
+                    Please try again later.
+                </p>
+            `;
+
         }
 
-        async function loadLiveProducts() {
-            const { data, error } = await supabaseClient
-                .from('products')
-                .select('id,name,price,category,description,image_url,created_at')
-                .eq('active', true)
-                .order('created_at', { ascending: false });
-            if (error) {
-                console.error('Could not load Supabase products:', error);
-                document.getElementById('supabase-products').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:#b91c1c;">Products are temporarily unavailable. Please try again later.</p>';
-                return;
-            }
-            renderLiveProducts(data || []);
-            const input = document.getElementById('product-search');
-            if (input?.value) filterProducts(input.value);
-        }
+        return;
+    }
 
-        setupProductSearch();
-        loadLiveProducts();
-    </script>
 
+    renderLiveProducts(data || []);
+
+
+    const input =
+        document.getElementById('product-search');
+
+
+    if (input?.value) {
+
+        filterProducts(input.value);
+
+    }
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+setupProductSearch();
+
+loadLiveProducts();
+
+</script>
 </body>
 </html>
