@@ -673,21 +673,20 @@ body {
             }
         }
 
-        /* MAKE ALL PRODUCT CARDS TRANSPARENT ON MOBILE */
+       /* FORCE ALL PRODUCT CARDS TRANSPARENT ON MOBILE */
 @media (max-width: 600px) {
+    .products-grid .product-card,
+    .products-grid .product-card .product-image,
+    .products-grid .product-card .product-info {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
     .products-grid .product-card {
-        background: transparent !important;
-        box-shadow: none;
-    }
-
-    .products-grid .product-image {
-        background: transparent !important;
-    }
-
-    .products-grid .product-info {
-        background: transparent !important;
+        box-shadow: none !important;
     }
 }
+
     </style>
 </head>
 <body>
