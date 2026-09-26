@@ -2,8 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://rgxnqvxmtdwvfydetkzh.supabase.co; connect-src https://rgxnqvxmtdwvfydetkzh.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Plugged by Shayo — Owner Panel</title>
@@ -22,29 +20,7 @@
 <div class="field"><label>Email</label><input id="email" type="email" required autocomplete="username"></div>
 <div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password"></div>
 <button type="submit">Login</button>
-<p><a href="#" id="forgotLink" style="font-size:14px">Forgot / set your password?</a></p>
 <p id="loginMsg" class="error"></p>
-</form>
-</section>
-
-<section id="resetCard" class="card hidden">
-<h2>Set a new password</h2>
-<p class="muted">Enter the email on your owner account. If it matches, we'll email you a secure link to set a new password.</p>
-<form id="resetRequestForm">
-<div class="field"><label>Email</label><input id="resetEmail" type="email" required autocomplete="username"></div>
-<button type="submit">Send reset link</button>
-<button type="button" id="backToLogin" class="secondary">Back to login</button>
-<p id="resetMsg"></p>
-</form>
-</section>
-
-<section id="newPasswordCard" class="card hidden">
-<h2>Choose your new password</h2>
-<p class="muted">You've followed a reset link from your email. Set a password only you know.</p>
-<form id="newPasswordForm">
-<div class="field"><label>New password</label><input id="newPassword" type="password" minlength="8" required autocomplete="new-password"></div>
-<button type="submit">Save password</button>
-<p id="newPasswordMsg"></p>
 </form>
 </section>
 
@@ -65,6 +41,72 @@
 <div class="card"><h2>Products</h2><p class="muted">Products marked active are visible on the public website.</p><div id="productsList">Loading...</div></div>
 </section>
 </main>
-<script src="admin.js"></script>
+<script>
+const SUPABASE_URL='https://rgxnqvxmtdwvfydetkzh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentUser=null;
+let currentImageUrl='';
+
+const $=id=>document.getElementById(id);
+function msg(el,text,ok=false){el.textContent=text;el.className=ok?'success':'error'}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function money(v){return 'Ksh. '+Number(v).toLocaleString('en-KE')+'/='}
+
+async function checkSession(){
+ const {data:{session}}=await db.auth.getSession();
+ if(session){currentUser=session.user; showPanel();} else showLogin();
+}
+function showLogin(){$('loginCard').classList.remove('hidden');$('panel').classList.add('hidden')}
+function showPanel(){$('loginCard').classList.add('hidden');$('panel').classList.remove('hidden');loadProducts()}
+
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();msg($('loginMsg'),'Logging in...');
+ const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+ if(error){msg($('loginMsg'),error.message);return}
+ currentUser=data.user;msg($('loginMsg'),'Logged in',true);showPanel();
+});
+$('logoutBtn').onclick=async()=>{await db.auth.signOut();showLogin()};
+$('cancelEdit').onclick=clearForm;
+$('image').addEventListener('change',()=>{const f=$('image').files[0];if(!f)return;$('preview').src=URL.createObjectURL(f);$('preview').style.display='block'});
+
+async function uploadImage(file){
+ const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const path=currentUser.id+'/'+crypto.randomUUID()+'.'+(ext||'jpg');
+ const {error}=await db.storage.from('product-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||'image/jpeg'});
+ if(error)throw error;
+ const {data}=db.storage.from('product-images').getPublicUrl(path);
+ return data.publicUrl;
+}
+
+$('productForm').addEventListener('submit',async e=>{
+ e.preventDefault();msg($('formMsg'),'Saving...');
+ try{
+  const id=$('productId').value;
+  let imageUrl=currentImageUrl;
+  const file=$('image').files[0];
+  if(file) imageUrl=await uploadImage(file);
+  const payload={name:$('name').value.trim(),price:Number($('price').value),category:$('category').value.trim(),description:$('description').value.trim(),image_url:imageUrl,active:true};
+  let result;
+  if(id) result=await db.from('products').update(payload).eq('id',id); else result=await db.from('products').insert(payload);
+  if(result.error)throw result.error;
+  msg($('formMsg'),'Product published successfully.',true);clearForm();loadProducts();
+ }catch(err){console.error(err);msg($('formMsg'),err.message||'Could not save product.')}
+});
+
+async function loadProducts(){
+ const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
+ if(error){$('productsList').innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
+ if(!data.length){$('productsList').innerHTML='<p class="muted">No products yet.</p>';return}
+ $('productsList').innerHTML=data.map(p=>`<div class="product"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}"><div><strong>${esc(p.name)}</strong><br>${money(p.price)}<br><span class="muted">${esc(p.category)}${p.active?'':' — hidden'}</span></div><div class="product-actions"><button onclick="editProduct('${p.id}')">Edit</button> <button class="danger" onclick="deleteProduct('${p.id}')">Delete</button></div></div>`).join('');
+}
+
+window.editProduct=async id=>{const {data,error}=await db.from('products').select('*').eq('id',id).single();if(error){alert(error.message);return}$('productId').value=data.id;$('name').value=data.name;$('price').value=data.price;$('category').value=data.category;$('description').value=data.description||'';currentImageUrl=data.image_url||'';$('image').value='';if(currentImageUrl){$('preview').src=currentImageUrl;$('preview').style.display='block'}window.scrollTo({top:0,behavior:'smooth'});};
+window.deleteProduct=async id=>{if(!confirm('Delete this product?'))return;const {error}=await db.from('products').delete().eq('id',id);if(error){alert(error.message);return}loadProducts()};
+function clearForm(){$('productForm').reset();$('productId').value='';currentImageUrl='';$('preview').style.display='none';$('formMsg').textContent=''}
+
+db.auth.onAuthStateChange((_event,session)=>{if(session){currentUser=session.user;showPanel()}else{currentUser=null;showLogin()}});
+checkSession();
+</script>
 </body>
 </html>
