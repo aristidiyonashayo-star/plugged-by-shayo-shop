@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- The owner panel must never appear in search results -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#1e40af">
+<title>Plugged by Shayo - Owner Panel</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header>
+    <h1>PLUGGED BY SHAYO</h1>
+    <p>Owner Product Panel</p>
+</header>
+
+<main>
+    <!-- If anything stops the panel loading it is reported here, rather
+         than the page silently doing nothing. -->
+    <div id="fatal" class="hidden card error-card">
+        <h2>Something went wrong</h2>
+        <p id="fatalMsg"></p>
+    </div>
+
+    <!-- ============ LOGIN ============ -->
+    <section id="loginCard" class="card">
+        <h2>Owner Login</h2>
+        <p class="muted">Use the owner account from Supabase Authentication.</p>
+        <form id="loginForm">
+            <div class="field">
+                <label for="email">Email</label>
+                <input id="email" type="email" required autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" required autocomplete="current-password">
+            </div>
+            <button type="submit">Login</button>
+            <button type="button" id="forgotLink" class="link">Forgot password?</button>
+            <p id="loginMsg" class="error"></p>
+        </form>
+    </section>
+
+    <!-- ============ PASSWORD RESET REQUEST ============ -->
+    <section id="resetCard" class="card hidden">
+        <h2>Reset Password</h2>
+        <p class="muted">We will email you a link to set a new password.</p>
+        <form id="resetRequestForm">
+            <div class="field">
+                <label for="resetEmail">Your account email</label>
+                <input id="resetEmail" type="email" required autocomplete="username">
+            </div>
+            <button type="submit">Send reset link</button>
+            <button type="button" id="backToLogin" class="secondary">Back to login</button>
+            <p id="resetMsg"></p>
+        </form>
+    </section>
+
+    <!-- ============ SET NEW PASSWORD ============ -->
+    <section id="newPasswordCard" class="card hidden">
+        <h2>Set a New Password</h2>
+        <form id="newPasswordForm">
+            <div class="field">
+                <label for="newPassword">New password</label>
+                <input id="newPassword" type="password" minlength="8" required autocomplete="new-password">
+                <p class="muted">At least 8 characters.</p>
+            </div>
+            <button type="submit">Save new password</button>
+            <p id="newPasswordMsg"></p>
+        </form>
+    </section>
+
+    <!-- ============ OWNER PANEL ============ -->
+    <section id="panel" class="hidden">
+
+        <div class="card">
+            <div class="row-header">
+                <div>
+                    <h2>Add / Edit Product</h2>
+                    <p class="muted">Upload a photo from your phone and publish it straight to the website.</p>
+                </div>
+                <div><button id="logoutBtn" class="secondary">Log out</button></div>
+            </div>
+
+            <form id="productForm">
+                <input id="productId" type="hidden">
+
+                <div class="field">
+                    <label for="image">Product photo</label>
+                    <input id="image" type="file" accept="image/*">
+                    <img id="preview" class="preview" alt="Preview of the selected photo">
+                    <p class="muted">Photos are resized and compressed automatically, so the site stays fast.</p>
+                </div>
+
+                <div class="field">
+                    <label for="name">Product name</label>
+                    <input id="name" maxlength="100" required placeholder="e.g. Air Jordan 4 Midnight Navy">
+                    <p class="muted">Write it plainly. Avoid the *asterisks* and emoji you use on WhatsApp - they show up as stray symbols on the website.</p>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label for="price">Price (Ksh)</label>
+                        <input id="price" type="number" min="0" step="1" required placeholder="3800">
+                    </div>
+                    <div class="field">
+                        <label for="category">Category</label>
+                        <select id="category" required></select>
+                        <p class="muted">Pick from the list so the product lands in the right section.</p>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="description">Description / sizes</label>
+                    <textarea id="description" maxlength="400" placeholder="Available sizes 39-44, black and white..."></textarea>
+                </div>
+
+                <div class="row">
+                    <button type="submit" class="green">Save &amp; Publish</button>
+                    <button type="button" id="cancelEdit" class="secondary">Clear</button>
+                </div>
+                <p id="formMsg"></p>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Products</h2>
+            <p class="muted">Products marked "Live" are visible on the website. Hidden ones stay in your list but customers cannot see them.</p>
+            <div id="productsList">Loading...</div>
+        </div>
+    </section>
+</main>
+
+<script src="categories.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
