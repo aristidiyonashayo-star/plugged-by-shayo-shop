@@ -1,0 +1,19 @@
+{
+  "name": "Plugged by Shayo",
+  "short_name": "Plugged",
+  "description": "Authentic sneakers, sandals and streetwear in Nairobi, Kenya. Order on WhatsApp.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eaf2fd",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/ico+xml",
+      "purpose": "any"
+    }
+  ]
+}
