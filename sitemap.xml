@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plugged by Shayo sitemap.
+  If you buy a real domain (e.g. pluggedbyshayo.co.ke), replace every
+  occurrence of the domain below AND the canonical tag in index.html.
+  Re-run "node build.js" after adding a page.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <url>
+    <loc>https://pluggedbyshayowearyourvibe.edgeone.dev/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+</urlset>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================
+     SITE DOMAIN
+     Change SITE_URL below AND in robots.txt + sitemap.xml if the
+     site ever moves (e.g. to pluggedbyshayo.co.ke).
+     ============================================================ -->
+<title>Plugged by Shayo | Authentic Sneakers &amp; Streetwear in Nairobi</title>
+
+<meta name="description" content="Plugged by Shayo sells authentic Nike, Jordan, Vans, New Balance, Adidas and Puma sneakers, sandals and streetwear in Nairobi CBD, Kenya. Delivery countrywide. Order on WhatsApp.">
+<meta name="keywords" content="sneakers Nairobi, authentic shoes Kenya, Nike Kenya, Jordan Nairobi, Air Force 1 Nairobi, Vans Kenya, New Balance Kenya, streetwear Nairobi, Plugged by Shayo">
+<meta name="author" content="Plugged by Shayo">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1e40af">
+<meta name="geo.region" content="KE-110">
+<meta name="geo.placename" content="Nairobi">
+
+<!-- Canonical: this MUST be your own domain.
+     It previously pointed at an l.instagram.com redirect URL and at an
+     old edgeone.dev subdomain, which stopped Google indexing the site. -->
+<link rel="canonical" href="https://pluggedbyshayowearyourvibe.edgeone.dev/">
+
+<!-- Open Graph (WhatsApp, Facebook, LinkedIn link previews) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plugged by Shayo">
+<meta property="og:title" content="Plugged by Shayo | Authentic Sneakers &amp; Streetwear in Nairobi">
+<meta property="og:description" content="Authentic sneakers, sandals and streetwear in Nairobi. Nike, Jordan, Vans, New Balance, Adidas and more. Fast delivery, order on WhatsApp.">
+<meta property="og:url" content="https://pluggedbyshayowearyourvibe.edgeone.dev/">
+<meta property="og:image" content="https://rgxnqvxmtdwvfydetkzh.supabase.co/storage/v1/object/public/product-images/fde8baa4-fbd8-40d1-9e97-0c71f0c861fd/bb3f9c14-bf63-48c7-ace7-9e31d97f2baa.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Plugged by Shayo - authentic sneakers in Nairobi">
+<meta property="og:locale" content="en_KE">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Plugged by Shayo | Authentic Sneakers &amp; Streetwear in Nairobi">
+<meta name="twitter:description" content="Authentic sneakers, sandals and streetwear in Nairobi. Order on WhatsApp.">
+<meta name="twitter:image" content="https://rgxnqvxmtdwvfydetkzh.supabase.co/storage/v1/object/public/product-images/fde8baa4-fbd8-40d1-9e97-0c71f0c861fd/bb3f9c14-bf63-48c7-ace7-9e31d97f2baa.jpg">
+
+<meta name="google-site-verification" content="7nJ2FCJc92P91uaF2EEE17hPkNo4RMvxqFympWNpYWE">
+
+<!-- Icons
+     Your own favicon.ico is the one that is used, and it is listed first
+     because browsers pick the first icon they understand.
+
+     The SVG below is only a fallback for browsers that cannot read .ico.
+
+     NOTE: this favicon.ico contains a single 16x16 image, which is the
+     smallest size still in use, so it will look soft on high-resolution
+     screens. If you can send the original logo at a larger size, a proper
+     multi-size icon set can be generated from it. -->
+<link rel="icon" href="favicon.ico" sizes="any">
+
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Preconnect so the product library and fonts load faster -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://rgxnqvxmtdwvfydetkzh.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- The background image is the largest thing on the page, so start
+     downloading it immediately instead of waiting for the CSS. -->
+<link rel="preload" as="image" href="/background-image.webp" type="image/webp">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <h1>Plugged by Shayo</h1>
+        <p class="tagline">Wear Your Vibe</p>
+        <p class="tagline-sub"><i>Your one-stop shop for authentic sneakers, fits, sandals &amp; New Era caps</i></p>
+        <p class="tagline-sub">Premium quality sneakers, shoes &amp; New Era caps delivered to your door</p>
+
+        <div class="search-wrap" role="search">
+            <i class="fas fa-search search-icon" aria-hidden="true"></i>
+            <label class="sr-only" for="product-search">Search products, brands or categories</label>
+            <input id="product-search" type="search" placeholder="Search products, brands or categories..." autocomplete="off">
+            <button type="button" id="search-clear" class="search-clear" aria-label="Clear product search" title="Clear search"><i class="fas fa-times" aria-hidden="true"></i></button>
+            <div id="search-status" class="search-status" role="status" aria-live="polite"></div>
+        </div>
+
+        <a href="https://wa.me/254112958414?text=Hi!%20I%20want%20to%20inquire%20about%20placing%20an%20order%20from%20Plugged%20by%20Shayo"
+           class="whatsapp-btn" target="_blank" rel="noopener">
+            <i class="fab fa-whatsapp whatsapp-icon" aria-hidden="true"></i>Inquire via WhatsApp
+        </a>
+    </div>
+</header>
+
+<nav aria-label="Product categories">
+    <a href="./" data-cat="">Home</a>
+    <a href="?cat=Nike" data-cat="Nike">Nike</a>
+    <a href="?cat=Jordan" data-cat="Jordan">Jordans</a>
+    <a href="?cat=Vans" data-cat="Vans">Vans</a>
+    <a href="?cat=New%20Balance" data-cat="New Balance">New Balance</a>
+    <a href="?cat=Airforce" data-cat="Airforce">Airforce</a>
+    <a href="?cat=Airmax" data-cat="Airmax">Air Max</a>
+    <a href="?cat=Samba" data-cat="Samba">Samba</a>
+    <a href="?cat=Converse" data-cat="Converse">Converse</a>
+    <a href="?cat=slides" data-cat="slides">Sandals</a>
+    <a href="?cat=Puma" data-cat="Puma">Puma</a>
+    <a href="?cat=ASICS" data-cat="ASICS">ASICS</a>
+    <a href="?cat=Timberland" data-cat="Timberland">Timberland</a>
+    <a href="?cat=Dr%20martens%20boots" data-cat="Dr martens boots">Dr Martens</a>
+    <a href="?cat=Numeris" data-cat="Numeris">Numeris</a>
+    <a href="?cat=Adidas" data-cat="Adidas">Adidas</a>
+    <a href="?cat=Clark" data-cat="Clark">Clarks</a>
+    <a href="?cat=New%20era" data-cat="New era">New Era Caps</a>
+    <a href="?cat=Other%20Brands" data-cat="Other Brands">Other Brands</a>
+</nav>
+
+<noscript>
+    <div class="notice">
+        <strong>JavaScript is switched off in your browser.</strong>
+        The full product catalogue loads with JavaScript, so it cannot be shown here.
+        Message us on WhatsApp and we will send you photos, prices and sizes directly:
+        <a href="https://wa.me/254112958414?text=Hi!%20Please%20send%20me%20your%20available%20products%20and%20prices.">+254 112 958 414</a>
+    </div>
+</noscript>
+
+<!-- PRODUCTS
+     The block between the PRE-RENDER markers is replaced by
+     `node build.js` with the real catalogue read from Supabase, so
+     Google and social apps see actual products instead of a spinner.
+     app.js re-renders the same content live for visitors. -->
+<section id="live-products" class="container">
+    <div id="supabase-products">
+        <!-- PRE-RENDER:START -->
+        <p class="loading">Loading products...</p>
+<!-- PRE-RENDER:END -->
+    </div>
+</section>
+
+<footer>
+    <p>&copy; <span id="year">2026</span> Plugged by Shayo. All rights reserved.</p>
+    <p>
+        WhatsApp:
+        <a href="https://wa.me/254112958414" target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> +254112958414</a>
+        |
+        Instagram:
+        <a href="https://www.instagram.com/plugged__by__.shayo" target="_blank" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i> @plugged__by__.shayo</a>
+    </p>
+</footer>
+
+<a href="https://wa.me/254112958414" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp" title="Chat with us on WhatsApp">
+    <i class="fab fa-whatsapp" aria-hidden="true"></i>
+</a>
+
+<!-- Structured data: helps Google show your shop details in search results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "name": "Plugged by Shayo",
+  "description": "Authentic sneakers, shoes, sandals and streetwear in Nairobi, Kenya. Nike, Jordan, Vans, New Balance, Adidas, Puma and more.",
+  "url": "https://pluggedbyshayowearyourvibe.edgeone.dev/",
+  "image": "https://pluggedbyshayowearyourvibe.edgeone.dev/og-image.jpg",
+  "telephone": "+254112958414",
+  "priceRange": "KSh 1,000 - KSh 10,000",
+  "currenciesAccepted": "KES",
+  "paymentAccepted": "M-Pesa, Cash",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Nairobi",
+    "addressRegion": "Nairobi",
+    "addressCountry": "KE"
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "Kenya"
+  },
+  "sameAs": [
+    "https://www.instagram.com/plugged__by__.shayo"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+254112958414",
+    "contactType": "sales",
+    "availableLanguage": ["en", "sw"]
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are the sneakers at Plugged by Shayo authentic?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Plugged by Shayo deals in authentic sneakers and streetwear only."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you deliver outside Nairobi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. We deliver anywhere in Kenya. Message us on WhatsApp at +254112958414 to arrange delivery to your town."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I order?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tap Inquire or Order on any product to open a WhatsApp chat with us, or message +254112958414 directly. Tell us the shoe, your size and your delivery location."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- PRODUCT-LIST-JSONLD:START -->
+
+<!-- PRODUCT-LIST-JSONLD:END -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="categories.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

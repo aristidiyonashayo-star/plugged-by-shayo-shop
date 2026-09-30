@@ -1,814 +1,494 @@
-const SUPABASE_URL = 'https://rgxnqvxmtdwvfydetkzh.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
+/* =========================================================
+   Plugged by Shayo - shop page script
+   ---------------------------------------------------------
+   Runs in the browser. The pure parts (buildProductCard,
+   renderProducts) are also exported so build.js can use the
+   exact same markup to pre-render products for Google.
+   ========================================================= */
+(function () {
+    'use strict';
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-);
+    /* ---------- CONFIG ---------- */
+    var SUPABASE_URL = 'https://rgxnqvxmtdwvfydetkzh.supabase.co';
+    var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_saQp6oatVhm5UsS-HkOCVw_6nsrCWDo';
+    var SHOP_WHATSAPP = '254112958414';
+    var SHOP_NAME = 'Plugged by Shayo';
 
-const SHOP_WHATSAPP = '254112958414';
+    var Cat = (typeof window !== 'undefined' && window.PBS) ||
+              (typeof require === 'function' ? require('./categories.js') : null);
 
-// Only allow https image URLs (blocks javascript:/data: tricks)
-function safeUrl(u){try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}}
+    /* ---------- HELPERS ---------- */
 
-function money(value) {
-    return 'Ksh. ' + Number(value).toLocaleString('en-KE') + '/=';
-}
-
-
-/* =========================================
-   CATEGORY CONFIGURATION
-========================================= */
-
-const CATEGORY_CONFIG = [
-    { key: 'Nike', title: 'Nike', icon: '' },
-    { key: 'Jordan', title: 'Jordans', icon: '' },
-    { key: 'Vans', title: 'Vans', icon: '' },
-    { key: 'New Balance', title: 'New Balance', icon: '' },
-    { key: 'Airforce', title: 'Airforce', icon: '' },
-    { key: 'Airmax', title: 'Air Max', icon: '' },
-    { key: 'Samba', title: 'Samba', icon: '' },
-    { key: 'Converse', title: 'Converse', icon: '' },
-    { key: 'slides', title: 'Sandals', icon: '' },
-    { key: 'Puma', title: 'Puma', icon: '' },
-    { key: 'Timberland', title: 'Timberland', icon: '' },
-    { key: 'ASICS', title: 'ASICS', icon: '' },
-    { key: 'Numeris', title: 'Numeris', icon: '' },
-    { key: 'Dr martens boots', title: 'Dr martens boots', icon: '' },
-    { key: 'Clark', title: 'Clarks', icon: '' },
-    { key: 'Adidas', title: 'Adidas', icon: '' },
-    { key: 'New era', title: 'New Era Caps', icon: '' }
-];
-
-
-/* =========================================
-   DETERMINE PRODUCT CATEGORY
-========================================= */
-
-function getProductCategory(productCategory) {
-
-    const category = String(productCategory || '')
-        .toLowerCase()
-        .trim();
-
-    if (category.includes('nike')) return 'Nike';
-
-    if (category.includes('jordan')) return 'Jordan';
-
-    if (category.includes('vans')) return 'Vans';
-
-    if (
-        category.includes('new balance') ||
-        category.includes('newbalance')
-    ) {
-        return 'New Balance';
+    /** Format a price the way the shop quotes it: Ksh. 3,900/= */
+    function money(value) {
+        var n = Number(value);
+        if (!isFinite(n)) return 'Ksh. -';
+        return 'Ksh. ' + n.toLocaleString('en-KE') + '/=';
     }
 
-    if (
-        category.includes('airforce') ||
-        category.includes('air force')
-    ) {
-        return 'Airforce';
-    }
-
-if (
-        category.includes('asics') ||
-        category.includes('asics')
-    ) {
-        return 'ASICS';
-    }
-
-    if (
-        category.includes('timberland') ||
-        category.includes('timberland')
-    ) {
-        return 'Timberland';
-    }
-
-    if (
-        category.includes('martens') ||
-        category.includes('martens')
-    ) {
-        return 'Dr martens boots';
-    }
-
-    if (
-        category.includes('numeris') ||
-        category.includes('numeris')
-    ) {
-        return 'Numeris';
-    }
-
-
-    if (
-        category.includes('airmax') ||
-        category.includes('air max')
-    ) {
-        return 'Airmax';
-    }
-
-    if (category.includes('samba')) return 'Samba';
-
-    if (category.includes('converse')) return 'Converse';
-
-    if (
-        category.includes('slide') ||
-        category.includes('sandals') ||
-        category.includes('sandal')
-    ) {
-        return 'slides';
-    }
-
-    if (category.includes('puma')) return 'Puma';
-
-    if (
-        category.includes('new era') ||
-        category.includes('newera')
-    ) {
-        return 'New era';
-    }
-
-    if (category.includes('adidas')) return 'Adidas';
-
-    if (
-        category.includes('clark') ||
-        category.includes('clarks')
-    ) {
-        return 'Clark';
-    }
-
-    return 'Other Brands';
-}
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value) {
-    return String(value ?? '').replace(
-        /[&<>'"]/g,
-        c => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[c])
-    );
-}
-
-
-/* =========================================
-   CREATE PRODUCT CARD
-========================================= */
-
-function createProductCard(product) {
-
-    // INQUIRE BUTTON
-    const inquireText =
-        `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
-
-    const inquireWa =
-        `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(inquireText)}`;
-
-
-    // ORDER BUTTON (fallback text, used if native image sharing isn't available)
-    const orderText =
-        `Hello! I would like to order this product from Plugged by Shayo.\n\n` +
-        `Product: ${product.name}\n` +
-        `Price: ${money(product.price)}\n` +
-        `Image: ${safeUrl(product.image_url) || 'No image available'}`;
-
-    const orderWa =
-        `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(orderText)}`;
-
-    const orderShareText =
-        `Hello! I would like to order this product from Plugged by Shayo.\n\n` +
-        `Product: ${product.name}\n` +
-        `Price: ${money(product.price)}`;
-
-
-    return `
-        <div class="product-card">
-
-            <div class="product-image">
-                ${safeUrl(product.image_url) ? `<img src="${escapeHtml(safeUrl(product.image_url))}" loading="lazy" decoding="async" alt="${escapeHtml(product.name)}">`
-                    : ''
-                }
-            </div>
-
-            <div class="product-info">
-
-                <h3>${escapeHtml(product.name)}</h3>
-
-                <p>${escapeHtml(product.description || '')}</p>
-
-                <div class="product-price">
-                    ${money(product.price)}
-                </div>
-
-                <div class="product-actions">
-
-                    <a href="${inquireWa}"
-                       target="_blank"
-                       rel="noopener"
-                       class="whatsapp-btn">
-                        <i class="fab fa-whatsapp"></i>
-                        Inquire about product
-                    </a>
-
-                    <button type="button"
-                       class="order-btn"
-                       data-order-name="${escapeHtml(product.name)}"
-                       data-order-text="${escapeHtml(orderShareText)}"
-                       data-order-image="${escapeHtml(safeUrl(product.image_url))}"
-                       data-order-fallback="${escapeHtml(orderWa)}">
-                        <i class="fas fa-shopping-cart"></i>
-                        Order this product
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-/* =========================================
-   RENDER PRODUCTS BY CATEGORY
-========================================= */
-
-function renderLiveProducts(products) {
-
-    const root =
-        document.getElementById('supabase-products');
-
-    if (!root) return;
-
-    if (!products || !products.length) {
-
-        root.innerHTML = `
-            <p style="
-                text-align:center;
-                color:#666;
-                padding:30px;
-            ">
-                No products available at the moment.
-            </p>
-        `;
-
-        return;
-    }
-
-
-    const grouped = {};
-
-
-    CATEGORY_CONFIG.forEach(category => {
-        grouped[category.key] = [];
-    });
-
-
-    grouped['Other Brands'] = [];
-
-
-    products.forEach(product => {
-
-        const category =
-            getProductCategory(product.category);
-
-        if (grouped[category]) {
-            grouped[category].push(product);
-        } else {
-            grouped['Other Brands'].push(product);
-        }
-
-    });
-
-
-    let html = '';
-
-
-    /* NORMAL CATEGORIES */
-
-    CATEGORY_CONFIG.forEach(category => {
-
-        const categoryProducts =
-            grouped[category.key];
-
-        if (!categoryProducts.length) return;
-
-
-        const sectionId =
-            'category-' +
-            category.key
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-');
-
-
-        html += `
-            <section
-                class="category"
-                id="${sectionId}"
-            >
-
-                <h2>
-
-                    <span class="category-icon">
-                        ${category.icon}
-                    </span>
-
-                    ${escapeHtml(category.title)}
-
-                </h2>
-
-
-                <div class="products-row-wrapper">
-
-                    <div class="products-grid">
-
-                        ${categoryProducts
-                            .map(createProductCard)
-                            .join('')}
-
-                    </div>
-
-
-                    <button
-                        class="category-scroll-btn"
-                        type="button"
-                        data-scroll="${sectionId}"
-                        aria-label="See more ${escapeHtml(category.title)} products"
-                    >
-
-                        <i class="fas fa-chevron-right"></i>
-
-                    </button>
-
-                </div>
-
-            </section>
-        `;
-    });
-
-
-    /* OTHER BRANDS */
-
-    if (grouped['Other Brands'].length) {
-
-        html += `
-            <section
-                class="category"
-                id="category-other-brands"
-            >
-
-                <h2>
-
-                    <span class="category-icon">
-                        
-                    </span>
-
-                    Other Brands
-
-                </h2>
-
-
-                <div class="products-row-wrapper">
-
-                    <div class="products-grid">
-
-                        ${grouped['Other Brands']
-                            .map(createProductCard)
-                            .join('')}
-
-                    </div>
-
-
-                    <button
-                        class="category-scroll-btn"
-                        type="button"
-                        data-scroll="category-other-brands"
-                        aria-label="See more Other Brands products"
-                    >
-
-                        <i class="fas fa-chevron-right"></i>
-
-                    </button>
-
-                </div>
-
-            </section>
-        `;
-    }
-
-
-    root.innerHTML = html;
-}
-
-
-/* =========================================
-   PC SCROLL BUTTON
-========================================= */
-
-function scrollCategory(sectionId) {
-
-    const section =
-        document.getElementById(sectionId);
-
-    if (!section) return;
-
-
-    const row =
-        section.querySelector('.products-grid');
-
-    if (!row) return;
-
-
-    row.scrollBy({
-        left: row.clientWidth * 0.75,
-        behavior: 'smooth'
-    });
-}
-
-
-/* =========================================
-   NAVIGATION CATEGORY
-========================================= */
-
-function searchCategory(category) {
-
-    const input =
-        document.getElementById('product-search');
-
-    if (!input) return;
-
-
-    /* HOME */
-
-    if (!category) {
-
-        input.value = '';
-
-        filterProducts('');
-
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-
-        return;
-    }
-
-
-    input.value = category;
-
-    filterProducts(category);
-
-
-    const config =
-        CATEGORY_CONFIG.find(item =>
-            item.key.toLowerCase() ===
-            category.toLowerCase()
-        );
-
-
-    let sectionId = '';
-
-
-    if (config) {
-
-        sectionId =
-            'category-' +
-            config.key
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-');
-
-    }
-
-
-    if (!sectionId) {
-        sectionId = 'category-other-brands';
-    }
-
-
-    const section =
-        document.getElementById(sectionId);
-
-
-    if (section) {
-
-        section.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-
-    }
-}
-
-
-/* =========================================
-   SEARCH FILTER
-========================================= */
-
-function filterProducts(searchTerm) {
-
-    const term =
-        String(searchTerm || '')
-            .trim()
-            .toLowerCase();
-
-
-    const categories =
-        document.querySelectorAll('.category');
-
-
-    let visibleCount = 0;
-
-
-    categories.forEach(category => {
-
-        const cards =
-            category.querySelectorAll('.product-card');
-
-        if (!cards.length) return;
-
-
-        let categoryMatches = 0;
-
-
-        const categoryName =
-            category.querySelector('h2')
-                ?.textContent
-                .toLowerCase() || '';
-
-
-        cards.forEach(card => {
-
-            const searchableText =
-                `${card.querySelector('h3')?.textContent || ''} ${card.querySelector('.product-info p')?.textContent || ''} ${categoryName} ${
-                    card.querySelector('img')?.alt || ''
-                }`.toLowerCase();
-
-
-            const matches =
-                !term ||
-                searchableText.includes(term);
-
-
-            card.style.display =
-                matches ? '' : 'none';
-
-
-            if (matches) {
-
-                categoryMatches++;
-                visibleCount++;
-
-            }
-
-        });
-
-
-        category.style.display =
-            categoryMatches > 0 ? '' : 'none';
-
-    });
-
-
-    const clearButton =
-        document.getElementById('search-clear');
-
-    const status =
-        document.getElementById('search-status');
-
-
-    if (clearButton) {
-
-        clearButton.style.display =
-            term ? 'block' : 'none';
-
-    }
-
-
-    if (status) {
-
-        status.style.display =
-            term ? 'block' : 'none';
-
-        status.textContent =
-            term
-                ? `${visibleCount} product${
-                    visibleCount === 1 ? '' : 's'
-                  } found`
-                : '';
-
-    }
-
-
-    document
-        .querySelectorAll('.no-search-results')
-        .forEach(el => el.remove());
-
-
-    if (term && visibleCount === 0) {
-
-        const liveSection =
-            document.getElementById('live-products');
-
-
-        const message =
-            document.createElement('div');
-
-
-        message.className =
-            'no-search-results';
-
-
-        message.style.display =
-            'block';
-
-
-        message.innerHTML = `
-            <strong>No products found.</strong>
-            <br>
-            Try another product name, brand or category.
-        `;
-
-
-        if (liveSection) {
-
-            liveSection.parentNode.insertBefore(
-                message,
-                liveSection
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================
-   SEARCH SETUP
-========================================= */
-
-function setupProductSearch() {
-
-    const input =
-        document.getElementById('product-search');
-
-    const clearButton =
-        document.getElementById('search-clear');
-
-
-    if (!input) return;
-
-
-    input.addEventListener('input', () => {
-
-        filterProducts(input.value);
-
-    });
-
-
-    clearButton?.addEventListener('click', () => {
-
-        input.value = '';
-
-        input.focus();
-
-        filterProducts('');
-
-    });
-
-}
-
-
-/* =========================================
-   LOAD PRODUCTS FROM SUPABASE
-========================================= */
-
-async function loadLiveProducts() {
-
-    const { data, error } =
-        await supabaseClient
-            .from('products')
-            .select(
-                'id,name,price,category,description,image_url,created_at'
-            )
-            .eq('active', true)
-            .order(
-                'created_at',
-                { ascending: false }
-            );
-
-
-    if (error) {
-
-        console.error(
-            'Could not load Supabase products:',
-            error
-        );
-
-
-        const root =
-            document.getElementById('supabase-products');
-
-
-        if (root) {
-
-            root.innerHTML = `
-                <p style="
-                    text-align:center;
-                    color:#b91c1c;
-                    padding:30px;
-                ">
-                    Products are temporarily unavailable.
-                    Please try again later.
-                </p>
-            `;
-
-        }
-
-        return;
-    }
-
-
-    renderLiveProducts(data || []);
-
-
-    const input =
-        document.getElementById('product-search');
-
-
-    if (input?.value) {
-
-        filterProducts(input.value);
-
-    }
-
-}
-
-
-/* =========================================
-   START
-========================================= */
-
-setupProductSearch();
-
-loadLiveProducts();
-
-
-document.addEventListener('click', e => {
-    const a = e.target.closest('[data-cat]');
-    if (a) { e.preventDefault(); searchCategory(a.dataset.cat); return; }
-    const b = e.target.closest('[data-scroll]');
-    if (b) { scrollCategory(b.dataset.scroll); return; }
-    const orderBtn = e.target.closest('.order-btn');
-    if (orderBtn) { handleOrderClick(orderBtn); }
-});
-
-/* =========================================
-   ORDER BUTTON: share the real photo when possible
-========================================= */
-
-async function handleOrderClick(btn) {
-
-    const text = btn.dataset.orderText || '';
-    const imageUrl = btn.dataset.orderImage || '';
-    const fallbackUrl = btn.dataset.orderFallback || '';
-    const name = btn.dataset.orderName || 'Product';
-
-    // Try the device's native share sheet with the actual image attached.
-    // Supported on most phones; WhatsApp shows up as a share target there.
-    if (imageUrl && navigator.canShare) {
+    /** Only allow https image URLs (blocks javascript:/data: tricks) */
+    function safeUrl(u) {
         try {
-            const response = await fetch(imageUrl);
-            if (response.ok) {
-                const blob = await response.blob();
-                const file = new File(
-                    [blob],
-                    'product.jpg',
-                    { type: blob.type || 'image/jpeg' }
-                );
-
-                if (navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], text, title: name });
-                    return; // shared with the real image attached — done
-                }
-            }
-        } catch (err) {
-            if (err && err.name === 'AbortError') return; // user cancelled the share sheet
-            // otherwise fall through to the WhatsApp link fallback below
+            var x = new URL(u);
+            return x.protocol === 'https:' ? x.href : '';
+        } catch (e) {
+            return '';
         }
     }
 
-    // Fallback (desktop browsers, or if sharing failed): open WhatsApp chat
-    // directly with the order text, including the image link.
-    if (fallbackUrl) {
-        window.open(fallbackUrl, '_blank', 'noopener');
+    function escapeHtml(value) {
+        return String(value === null || value === undefined ? '' : value).replace(
+            /[&<>'"]/g,
+            function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c];
+            }
+        );
     }
-}
+
+    /**
+     * Product names are often pasted straight from WhatsApp, so they
+     * arrive wrapped in *asterisks* with emoji. Strip the markdown and
+     * the decorative symbols for display; the raw name is still used in
+     * the WhatsApp message so the owner recognises the item.
+     */
+    function cleanName(raw) {
+        var s = String(raw === null || raw === undefined ? '' : raw);
+        s = s.replace(/\*/g, ' ');                       // markdown bold
+        s = s.replace(/[\u0000-\u001F\u007F]/g, ' ');    // control chars
+        s = s.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2190}-\u{21FF}]/gu, ' ');
+        s = s.replace(/[®™©]/g, ' ');
+        s = s.replace(/\s+/g, ' ').trim();
+        s = s.replace(/^[\-–—_:;,.\s]+/, '').replace(/[\-–—_:;,.\s]+$/, '');
+        return s || String(raw || '').trim();
+    }
+
+    function whatsappLink(text) {
+        return 'https://wa.me/' + SHOP_WHATSAPP + '?text=' + encodeURIComponent(text);
+    }
+
+    /** Build the WhatsApp link for "I want to ask about this" */
+    function inquireUrl(product) {
+        return whatsappLink(
+            'Hi! I want to inquire about ' + (product.name || 'a product') +
+            ' from ' + SHOP_NAME + '. Please tell me about available colors and sizes.'
+        );
+    }
+
+    /**
+     * The message the customer's WhatsApp opens with when they press
+     * "Order this product". It carries the name, price, sizes and the
+     * photo link so the owner knows exactly which shoe is being ordered.
+     */
+    function orderMessage(product) {
+        var lines = [
+            'Hello ' + SHOP_NAME + '! I would like to ORDER this product.',
+            '',
+            'Product: ' + (product.name || ''),
+            'Price: ' + money(product.price)
+        ];
+
+        if (product.description) {
+            lines.push('Sizes / details: ' + product.description);
+        }
+
+        var img = safeUrl(product.image_url);
+        if (img) lines.push('Photo: ' + img);
+
+        lines.push('');
+        lines.push('My size: ______');
+        lines.push('My location: ______');
+
+        return lines.join('\n');
+    }
+
+    /** Direct wa.me link that opens WhatsApp with the order pre-filled */
+    function orderUrl(product) {
+        return whatsappLink(orderMessage(product));
+    }
+
+    /* ---------- PRODUCT CARD (pure) ---------- */
+
+    /**
+     * @param {object} product - { name, price, description, image_url, category }
+     * @param {object} [opts]  - { eager: true } disables lazy loading
+     *                           (used for the first few pre-rendered cards)
+     * @returns {string} HTML
+     */
+    function buildProductCard(product, opts) {
+        opts = opts || {};
+        var displayName = cleanName(product.name);
+        var img = safeUrl(product.image_url);
+        var inquiry = inquireUrl(product);
+        var order = orderUrl(product);
+
+        return '' +
+            '<article class="product-card">' +
+                '<div class="product-image">' +
+                    (img
+                        ? '<img src="' + escapeHtml(img) + '"' +
+                          ' alt="' + escapeHtml(displayName) + '"' +
+                          ' loading="' + (opts.eager ? 'eager' : 'lazy') + '"' +
+                          ' decoding="async" width="240" height="250">'
+                        : '') +
+                '</div>' +
+                '<div class="product-info">' +
+                    '<h3>' + escapeHtml(displayName) + '</h3>' +
+                    (product.description
+                        ? '<p>' + escapeHtml(product.description) + '</p>'
+                        : '') +
+                    '<div class="product-price">' + escapeHtml(money(product.price)) + '</div>' +
+                    '<div class="product-actions">' +
+                        /* A plain link to WhatsApp. This always works - on
+                           desktop, on Android, on iPhone - and it opens the
+                           chat with the product name, price, sizes and photo
+                           already typed in. */
+                        '<a href="' + escapeHtml(order) + '"' +
+                        ' target="_blank" rel="noopener noreferrer"' +
+                        ' class="order-btn"' +
+                        ' aria-label="Order ' + escapeHtml(displayName) + ' on WhatsApp">' +
+                            '<i class="fas fa-shopping-cart" aria-hidden="true"></i>' +
+                            ' Order this product' +
+                        '</a>' +
+                        '<a href="' + escapeHtml(inquiry) + '"' +
+                        ' target="_blank" rel="noopener noreferrer"' +
+                        ' class="whatsapp-btn">' +
+                            '<i class="fab fa-whatsapp" aria-hidden="true"></i>' +
+                            ' Inquire product' +
+                        '</a>' +
+                    '</div>' +
+                '</div>' +
+            '</article>';
+    }
+
+    /* ---------- GROUPING + RENDERING (pure) ---------- */
+
+    /**
+     * Group products into category buckets, keeping the order the
+     * categories are declared in categories.js.
+     * @returns {Array<{key,title,products}>} only non-empty buckets
+     */
+    function groupProducts(products) {
+        var buckets = {};
+        Cat.CATEGORIES.forEach(function (c) { buckets[c.key] = []; });
+        buckets[Cat.OTHER_KEY] = [];
+
+        (products || []).forEach(function (product) {
+            var key = Cat.classify(product);
+            if (!buckets[key]) {
+                buckets[Cat.OTHER_KEY].push(product);
+            } else {
+                buckets[key].push(product);
+            }
+        });
+
+        var ordered = [];
+        Cat.CATEGORIES.forEach(function (c) {
+            if (buckets[c.key].length) {
+                ordered.push({ key: c.key, title: c.title, products: buckets[c.key] });
+            }
+        });
+        if (buckets[Cat.OTHER_KEY].length) {
+            ordered.push({
+                key: Cat.OTHER_KEY,
+                title: Cat.OTHER_TITLE,
+                products: buckets[Cat.OTHER_KEY]
+            });
+        }
+        return ordered;
+    }
+
+    /**
+     * Full HTML for every category section.
+     * @param {Array} products
+     * @param {object} [opts] - { eagerCount: number }
+     */
+    function renderProducts(products, opts) {
+        opts = opts || {};
+        var eagerCount = typeof opts.eagerCount === 'number' ? opts.eagerCount : 0;
+        var groups = groupProducts(products);
+
+        if (!groups.length) {
+            return '<p class="no-products">No products available at the moment. ' +
+                   'Please check back soon or message us on WhatsApp.</p>';
+        }
+
+        var seen = 0;
+
+        return groups.map(function (group) {
+            var id = Cat.sectionId(group.key);
+
+            var cards = group.products.map(function (product) {
+                var eager = seen < eagerCount;
+                seen++;
+                return buildProductCard(product, { eager: eager });
+            }).join('');
+
+            return '' +
+                '<section class="category" id="' + id + '" data-category="' +
+                    escapeHtml(group.key) + '">' +
+                    '<h2>' +
+                        '<span class="category-icon" aria-hidden="true"></span>' +
+                        escapeHtml(group.title) +
+                    '</h2>' +
+                    '<div class="products-row-wrapper">' +
+                        '<div class="products-grid">' + cards + '</div>' +
+                        '<button class="category-scroll-btn" type="button"' +
+                        ' data-scroll="' + id + '"' +
+                        ' aria-label="See more ' + escapeHtml(group.title) + ' products">' +
+                            '<i class="fas fa-chevron-right" aria-hidden="true"></i>' +
+                        '</button>' +
+                    '</div>' +
+                '</section>';
+        }).join('');
+    }
+
+    /* ---------- EXPORT PURE PARTS (for build.js) ---------- */
+    var pureApi = {
+        money: money,
+        safeUrl: safeUrl,
+        escapeHtml: escapeHtml,
+        cleanName: cleanName,
+        inquireUrl: inquireUrl,
+        orderMessage: orderMessage,
+        orderUrl: orderUrl,
+        buildProductCard: buildProductCard,
+        groupProducts: groupProducts,
+        renderProducts: renderProducts,
+        SHOP_WHATSAPP: SHOP_WHATSAPP,
+        SHOP_NAME: SHOP_NAME
+    };
+
+    if (typeof module === 'object' && module.exports) {
+        module.exports = pureApi;
+        return; /* nothing DOM-related in Node */
+    }
+
+    window.PBSApp = pureApi;
+
+    /* =======================================================
+       Everything below needs the browser
+       ======================================================= */
+
+    var supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+    var PRODUCTS = [];
+
+    function root() {
+        return document.getElementById('supabase-products');
+    }
+
+    function setYear() {
+        var el = document.getElementById('year');
+        if (el) el.textContent = String(new Date().getFullYear());
+    }
+
+    /* ---------- SCROLL ---------- */
+    function scrollCategory(sectionIdToScroll) {
+        var section = document.getElementById(sectionIdToScroll);
+        if (!section) return;
+        var row = section.querySelector('.products-grid');
+        if (!row) return;
+        row.scrollBy({ left: row.clientWidth * 0.75, behavior: 'smooth' });
+    }
+
+    /* ---------- FILTER ---------- */
+    function filterProducts(searchTerm) {
+        var term = String(searchTerm || '').trim().toLowerCase();
+        var sections = document.querySelectorAll('.category');
+        var visibleCount = 0;
+
+        sections.forEach(function (section) {
+            var cards = section.querySelectorAll('.product-card');
+            if (!cards.length) return;
+
+            var matches = 0;
+            cards.forEach(function (card) {
+                /* Only search the product's own text. The old version also
+                   matched the category heading, so searching "nike" hid
+                   every other brand and made the nav behave oddly. */
+                var haystack = card.textContent.toLowerCase() + ' ' +
+                    ((card.querySelector('img') && card.querySelector('img').alt) || '').toLowerCase();
+
+                var hit = !term || haystack.indexOf(term) !== -1;
+                card.style.display = hit ? '' : 'none';
+                if (hit) { matches++; visibleCount++; }
+            });
+
+            section.style.display = matches > 0 ? '' : 'none';
+        });
+
+        var clearButton = document.getElementById('search-clear');
+        var status = document.getElementById('search-status');
+
+        if (clearButton) clearButton.style.display = term ? 'block' : 'none';
+
+        if (status) {
+            status.style.display = term ? 'block' : 'none';
+            status.textContent = term
+                ? visibleCount + ' product' + (visibleCount === 1 ? '' : 's') + ' found'
+                : '';
+        }
+
+        document.querySelectorAll('.no-search-results').forEach(function (el) { el.remove(); });
+
+        if (term && visibleCount === 0) {
+            var liveSection = document.getElementById('live-products');
+            if (liveSection && liveSection.parentNode) {
+                var message = document.createElement('div');
+                message.className = 'no-search-results';
+                message.style.display = 'block';
+                message.innerHTML = '<strong>No products found.</strong><br>' +
+                    'Try another product name, brand or category.';
+                liveSection.parentNode.insertBefore(message, liveSection);
+            }
+        }
+    }
+
+    /* ---------- CATEGORY NAVIGATION (real URLs) ---------- */
+    /**
+     * Selecting a category now updates the address bar to ?cat=Nike
+     * instead of href="#", so a customer can bookmark it, share it,
+     * use the back button, and Google can follow the link.
+     */
+    function searchCategory(category, options) {
+        options = options || {};
+        var input = document.getElementById('product-search');
+        if (!input) return;
+
+        var value = category || '';
+
+        input.value = value;
+        filterProducts(value);
+
+        /* Reflect the choice in the URL */
+        if (options.updateUrl !== false) {
+            var url = new URL(window.location.href);
+            if (value) {
+                url.searchParams.set('cat', value);
+            } else {
+                url.searchParams.delete('cat');
+            }
+            var next = url.pathname + (url.search || '');
+            if (options.replace) {
+                window.history.replaceState({ cat: value }, '', next);
+            } else {
+                window.history.pushState({ cat: value }, '', next);
+            }
+        }
+
+        if (!value) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        /* Scroll to the section for this category, if it exists */
+        var section = document.getElementById(Cat.sectionId(value));
+        if (!section) {
+            var isKnown = Cat.CATEGORIES.some(function (c) {
+                return c.key.toLowerCase() === value.toLowerCase();
+            });
+            if (!isKnown) section = document.getElementById(Cat.sectionId(Cat.OTHER_KEY));
+        }
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    /* ---------- LOAD FROM SUPABASE ---------- */
+    function showError(message) {
+        var el = root();
+        if (el) el.innerHTML = '<p class="no-products">' + escapeHtml(message) + '</p>';
+    }
+
+    async function loadLiveProducts() {
+        var result = await supabaseClient
+            .from('products')
+            .select('id,name,price,category,description,image_url,created_at')
+            .eq('active', true)
+            .order('created_at', { ascending: false });
+
+        if (result.error) {
+            console.error('Could not load Supabase products:', result.error);
+            showError('Products are temporarily unavailable. Please try again later.');
+            return;
+        }
+
+        PRODUCTS = result.data || [];
+
+        var el = root();
+        if (el) el.innerHTML = renderProducts(PRODUCTS, { eagerCount: 3 });
+
+        var input = document.getElementById('product-search');
+        if (input && input.value) filterProducts(input.value);
+    }
+
+    /* ---------- EVENTS ---------- */
+    function setupSearch() {
+        var input = document.getElementById('product-search');
+        var clearButton = document.getElementById('search-clear');
+        if (!input) return;
+
+        var debounce = null;
+        input.addEventListener('input', function () {
+            clearTimeout(debounce);
+            debounce = setTimeout(function () { filterProducts(input.value); }, 120);
+        });
+
+        if (clearButton) {
+            clearButton.addEventListener('click', function () {
+                input.value = '';
+                input.focus();
+                filterProducts('');
+                searchCategory('', { replace: true });
+            });
+        }
+    }
+
+    function setupNav() {
+        document.addEventListener('click', function (e) {
+            var navLink = e.target.closest('[data-cat]');
+            if (navLink) {
+                /* Let the browser handle middle-click / new-tab clicks */
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                searchCategory(navLink.dataset.cat || '');
+                return;
+            }
+
+            var scrollBtn = e.target.closest('[data-scroll]');
+            if (scrollBtn) {
+                scrollCategory(scrollBtn.dataset.scroll);
+            }
+        });
+
+        /* Back / forward buttons */
+        window.addEventListener('popstate', function () {
+            var value = new URL(window.location.href).searchParams.get('cat') || '';
+            searchCategory(value, { updateUrl: false });
+        });
+    }
+
+    /* ---------- START ---------- */
+    function start() {
+        setYear();
+        setupSearch();
+        setupNav();
+
+        /* Apply ?cat=... on first load so shared links work */
+        var initial = new URL(window.location.href).searchParams.get('cat') || '';
+        if (initial) {
+            searchCategory(initial, { updateUrl: false, replace: true });
+        }
+
+        loadLiveProducts();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+    } else {
+        start();
+    }
+})();

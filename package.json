@@ -1,0 +1,14 @@
+{
+  "name": "plugged-by-shayo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plugged by Shayo - sneaker shop website. Products are managed in Supabase; build.js pre-renders them into static HTML so search engines can index them.",
+  "scripts": {
+    "build": "node build.js",
+    "verify": "node verify.js",
+    "check": "node --check app.js && node --check categories.js && node --check admin.js && node --check build.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
