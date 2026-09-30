@@ -4,13 +4,13 @@
 User-agent: *
 Allow: /
 
-# The owner panel should never appear in search results
+# The owner panel must never appear in search results
 Disallow: /admin.html
 Disallow: /admin.js
 
-# Category filters are the same page with a query string.
-# Blocking them avoids duplicate-content warnings; the links
-# themselves are still followed, so Google finds every category.
+# Category filters are the same page with a query string. Blocking them
+# avoids duplicate-content warnings; the links are still followed, so
+# Google still discovers every category.
 Disallow: /*?cat=
 
 Sitemap: https://pluggedbyshayowearyourvibe.edgeone.dev/sitemap.xml
