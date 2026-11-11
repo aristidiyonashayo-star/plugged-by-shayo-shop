@@ -71,24 +71,36 @@ $('productForm').addEventListener('submit',async e=>{
   let imageUrl=currentImageUrl;
   const file=$('image').files[0];
   if(file) imageUrl=await uploadImage(file);
-  const payload={name:$('name').value.trim(),price:Number($('price').value),category:$('category').value.trim(),description:$('description').value.trim(),image_url:imageUrl};
+  const colors=[];
+  for(const row of document.querySelectorAll('#colorRows .color-row')){
+   const cname=row.querySelector('.color-name').value.trim();
+   const cfile=row.querySelector('.color-file').files[0];
+   let curl=row.dataset.url||'';
+   if(!cname&&!cfile&&!curl)continue;
+   if(!cname)throw new Error('Please give every color a name (e.g. Pink).');
+   if(cfile)curl=await uploadImage(cfile);
+   if(!curl)throw new Error('Please add a photo for the color "'+cname+'".');
+   colors.push({name:cname,image_url:curl});
+  }
+  if(!imageUrl&&colors.length)imageUrl=colors[0].image_url;
+  const payload={name:$('name').value.trim(),price:Number($('price').value),category:$('category').value.trim(),description:$('description').value.trim(),image_url:imageUrl,colors};
   let result;
   if(id) result=await db.from('products').update(payload).eq('id',id); else result=await db.from('products').insert({...payload,active:true});
   if(result.error)throw result.error;
   msg($('formMsg'),'Product published successfully.',true);clearForm();loadProducts();
- }catch(err){console.error(err);msg($('formMsg'),err.message||'Could not save product.')}finally{if(btn)btn.disabled=false}
+ }catch(err){console.error(err);msg($('formMsg'),/colors/i.test(err.message||'')?'The database is missing the "colors" column. Run the SQL step first, then try again.':(err.message||'Could not save product.'))}finally{if(btn)btn.disabled=false}
 });
 
 async function loadProducts(){
  const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
  if(error){$('productsList').innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
  if(!data.length){$('productsList').innerHTML='<p class="muted">No products yet.</p>';return}
- $('productsList').innerHTML=data.map(p=>`<div class="product"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}"><div><strong>${esc(p.name)}</strong><br>${money(p.price)}<br><span class="muted">${esc(p.category)}${p.active?'':' — hidden'}</span></div><div class="product-actions"><button data-edit="${esc(p.id)}">Edit</button> <button class="secondary" data-toggle="${esc(p.id)}" data-active="${p.active?1:0}">${p.active?'Hide':'Show'}</button> <button class="danger" data-del="${esc(p.id)}">Delete</button></div></div>`).join('');
+ $('productsList').innerHTML=data.map(p=>`<div class="product"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}"><div><strong>${esc(p.name)}</strong><br>${money(p.price)}<br><span class="muted">${esc(p.category)}${Array.isArray(p.colors)&&p.colors.length?' — '+p.colors.length+' colors':''}${p.active?'':' — hidden'}</span></div><div class="product-actions"><button data-edit="${esc(p.id)}">Edit</button> <button class="secondary" data-toggle="${esc(p.id)}" data-active="${p.active?1:0}">${p.active?'Hide':'Show'}</button> <button class="danger" data-del="${esc(p.id)}">Delete</button></div></div>`).join('');
 }
 
-window.editProduct=async id=>{const {data,error}=await db.from('products').select('*').eq('id',id).single();if(error){alert(error.message);return}$('productId').value=data.id;$('name').value=data.name;$('price').value=data.price;$('category').value=data.category;$('description').value=data.description||'';currentImageUrl=data.image_url||'';$('image').value='';if(currentImageUrl){$('preview').src=currentImageUrl;$('preview').style.display='block'}window.scrollTo({top:0,behavior:'smooth'});};
+window.editProduct=async id=>{const {data,error}=await db.from('products').select('*').eq('id',id).single();if(error){alert(error.message);return}$('productId').value=data.id;$('name').value=data.name;$('price').value=data.price;$('category').value=data.category;$('description').value=data.description||'';currentImageUrl=data.image_url||'';$('colorRows').innerHTML='';(Array.isArray(data.colors)?data.colors:[]).forEach(addColorRow);$('image').value='';if(currentImageUrl){$('preview').src=currentImageUrl;$('preview').style.display='block'}window.scrollTo({top:0,behavior:'smooth'});};
 window.deleteProduct=async id=>{if(!confirm('Delete this product?'))return;const {error}=await db.from('products').delete().eq('id',id);if(error){alert(error.message);return}loadProducts()};
-function clearForm(){$('productForm').reset();$('productId').value='';currentImageUrl='';$('preview').style.display='none';$('formMsg').textContent=''}
+function clearForm(){$('productForm').reset();$('colorRows').innerHTML='';$('productId').value='';currentImageUrl='';$('preview').style.display='none';$('formMsg').textContent=''}
 
 db.auth.onAuthStateChange((_e,session)=>{if(session){currentUser=session.user}else{currentUser=null;showLogin()}});
 checkSession();
@@ -98,3 +110,16 @@ $('productsList').addEventListener('click',async e=>{
  if(b.dataset.del)return window.deleteProduct(b.dataset.del);
  if(b.dataset.toggle){const {error}=await db.from('products').update({active:b.dataset.active!=='1'}).eq('id',b.dataset.toggle);if(error)alert(error.message);else loadProducts()}
 });
+
+function addColorRow(c){
+ const row=document.createElement('div');row.className='color-row';row.dataset.url=(c&&c.image_url)||'';
+ const img=document.createElement('img');img.className='color-thumb';img.alt='';
+ if(row.dataset.url){img.src=row.dataset.url}else{img.style.display='none'}
+ const name=document.createElement('input');name.className='color-name';name.maxLength=30;name.placeholder='Color name e.g. Pink';name.value=(c&&c.name)||'';
+ const file=document.createElement('input');file.type='file';file.accept='image/*';file.className='color-file';
+ file.addEventListener('change',()=>{const f=file.files[0];if(!f)return;img.src=URL.createObjectURL(f);img.style.display='block'});
+ const rm=document.createElement('button');rm.type='button';rm.className='danger';rm.textContent='Remove';rm.onclick=()=>row.remove();
+ const fields=document.createElement('div');fields.className='color-fields';fields.append(name,file);
+ row.append(img,fields,rm);$('colorRows').appendChild(row);
+}
+document.addEventListener('click',e=>{if(e.target.closest('#addColor'))addColorRow()});

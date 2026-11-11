@@ -7,6 +7,7 @@ const supabaseClient = window.supabase.createClient(
 );
 
 const SHOP_WHATSAPP = '254112958414';
+const productsById = {};
 
 // Only allow https image URLs (blocks javascript:/data: tricks)
 function safeUrl(u){try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}}
@@ -165,6 +166,8 @@ function escapeHtml(value) {
 
 function createProductCard(product) {
 
+    const colorCount = getColors(product).length;
+
     // INQUIRE BUTTON
     const inquireText =
         `Hi! I want to inquire about ${product.name} from Plugged by Shayo. Please tell me about available colors and sizes.`;
@@ -190,9 +193,10 @@ function createProductCard(product) {
 
 
     return `
-        <div class="product-card">
+        <div class="product-card" data-pid="${escapeHtml(product.id)}">
 
             <div class="product-image">
+                ${colorCount > 1 ? `<span class="color-badge">${colorCount} colors</span>` : ''}
                 ${safeUrl(product.image_url) ? `<img src="${escapeHtml(safeUrl(product.image_url))}" loading="lazy" decoding="async" alt="${escapeHtml(product.name)}">`
                     : ''
                 }
@@ -220,12 +224,14 @@ function createProductCard(product) {
 
                     <button type="button"
                        class="order-btn"
+                       data-pid="${escapeHtml(product.id)}"
+                       data-multi="${colorCount > 1 ? 1 : 0}"
                        data-order-name="${escapeHtml(product.name)}"
                        data-order-text="${escapeHtml(orderShareText)}"
                        data-order-image="${escapeHtml(safeUrl(product.image_url))}"
                        data-order-fallback="${escapeHtml(orderWa)}">
                         <i class="fas fa-shopping-cart"></i>
-                        Order this product
+                        ${colorCount > 1 ? 'Choose color &amp; order' : 'Order this product'}
                     </button>
 
                 </div>
@@ -262,6 +268,8 @@ function renderLiveProducts(products) {
         return;
     }
 
+
+    products.forEach(p => { productsById[p.id] = p; });
 
     const grouped = {};
 
@@ -693,17 +701,24 @@ function setupProductSearch() {
 
 async function loadLiveProducts() {
 
-    const { data, error } =
-        await supabaseClient
+    const fetchProducts = cols =>
+        supabaseClient
             .from('products')
-            .select(
-                'id,name,price,category,description,image_url,created_at'
-            )
+            .select(cols)
             .eq('active', true)
-            .order(
-                'created_at',
-                { ascending: false }
-            );
+            .order('created_at', { ascending: false });
+
+    let { data, error } = await fetchProducts(
+        'id,name,price,category,description,image_url,colors,created_at'
+    );
+
+    // If the "colors" column has not been added to the database yet,
+    // still show the shop normally (without color options).
+    if (error) {
+        ({ data, error } = await fetchProducts(
+            'id,name,price,category,description,image_url,created_at'
+        ));
+    }
 
 
     if (error) {
@@ -768,7 +783,9 @@ document.addEventListener('click', e => {
     const b = e.target.closest('[data-scroll]');
     if (b) { scrollCategory(b.dataset.scroll); return; }
     const orderBtn = e.target.closest('.order-btn');
-    if (orderBtn) { handleOrderClick(orderBtn); }
+    if (orderBtn && !orderBtn.closest('.pm')) { handleOrderClick(orderBtn); return; }
+    const card = e.target.closest('.product-card');
+    if (card && card.dataset.pid && !e.target.closest('a')) { openProduct(card.dataset.pid); }
 });
 
 /* =========================================
@@ -776,6 +793,12 @@ document.addEventListener('click', e => {
 ========================================= */
 
 async function handleOrderClick(btn) {
+
+    // Product has several colors: let the customer pick one first
+    if (btn.dataset.multi === '1' && btn.dataset.pid) {
+        openProduct(btn.dataset.pid);
+        return;
+    }
 
     const text = btn.dataset.orderText || '';
     const imageUrl = btn.dataset.orderImage || '';
@@ -811,4 +834,159 @@ async function handleOrderClick(btn) {
     if (fallbackUrl) {
         window.open(fallbackUrl, '_blank', 'noopener');
     }
+}
+
+
+/* =========================================
+   PRODUCT VIEW: tap a product to see its colors
+========================================= */
+
+function getColors(product) {
+    const list = Array.isArray(product.colors) ? product.colors : [];
+    return list
+        .map(c => ({
+            name: String((c && c.name) || '').trim(),
+            image_url: safeUrl(c && c.image_url)
+        }))
+        .filter(c => c.image_url);
+}
+
+let pmEl = null;
+let pmProduct = null;
+let pmOptions = [];
+
+function ensureProductModal() {
+    if (pmEl) return pmEl;
+
+    pmEl = document.createElement('div');
+    pmEl.className = 'pm';
+    pmEl.hidden = true;
+    pmEl.setAttribute('role', 'dialog');
+    pmEl.setAttribute('aria-modal', 'true');
+    pmEl.innerHTML = `
+        <div class="pm-box">
+            <button type="button" class="pm-close" aria-label="Close">&times;</button>
+            <div class="pm-img"><img alt=""></div>
+            <div class="pm-body">
+                <h3 class="pm-name"></h3>
+                <div class="pm-price"></div>
+                <div class="pm-colorlabel">Color: <strong></strong></div>
+                <div class="pm-thumbs"></div>
+                <p class="pm-desc"></p>
+                <div class="product-actions">
+                    <a class="whatsapp-btn pm-inquire" target="_blank" rel="noopener">
+                        <i class="fab fa-whatsapp"></i> Inquire about product
+                    </a>
+                    <button type="button" class="order-btn">
+                        <i class="fas fa-shopping-cart"></i> Order this product
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    document.body.appendChild(pmEl);
+
+    pmEl.addEventListener('click', e => {
+        if (e.target === pmEl || e.target.closest('.pm-close')) closeProduct();
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && !pmEl.hidden) closeProduct();
+    });
+
+    pmEl.querySelector('.order-btn').addEventListener('click', () => {
+        const opt = pmOptions[pmEl.dataset.index || 0] || {};
+        const color = opt.name || '';
+        const text =
+            `Hello! I would like to order this product from Plugged by Shayo.\n\n` +
+            `Product: ${pmProduct.name}\n` +
+            (color ? `Color: ${color}\n` : '') +
+            `Price: ${money(pmProduct.price)}`;
+        const fallback =
+            `https://wa.me/${SHOP_WHATSAPP}?text=` +
+            encodeURIComponent(text + `\nImage: ${opt.image_url || ''}`);
+        handleOrderClick({
+            dataset: {
+                orderText: text,
+                orderImage: opt.image_url || '',
+                orderFallback: fallback,
+                orderName: pmProduct.name
+            }
+        });
+    });
+
+    return pmEl;
+}
+
+function selectColor(index) {
+    const opt = pmOptions[index];
+    if (!opt) return;
+
+    pmEl.dataset.index = index;
+    const img = pmEl.querySelector('.pm-img img');
+    img.src = opt.image_url;
+    img.alt = pmProduct.name + (opt.name ? ' - ' + opt.name : '');
+    pmEl.querySelector('.pm-colorlabel strong').textContent = opt.name;
+
+    pmEl.querySelectorAll('.pm-thumb').forEach((t, i) =>
+        t.classList.toggle('active', i === index)
+    );
+
+    const text =
+        `Hi! I want to inquire about ${pmProduct.name}` +
+        (opt.name ? ` in ${opt.name}` : '') +
+        ` from Plugged by Shayo. Please tell me about available sizes.`;
+    pmEl.querySelector('.pm-inquire').href =
+        `https://wa.me/${SHOP_WHATSAPP}?text=${encodeURIComponent(text)}`;
+}
+
+function openProduct(id) {
+    const product = productsById[id];
+    if (!product) return;
+
+    pmProduct = product;
+    const colors = getColors(product);
+    const cover = safeUrl(product.image_url);
+
+    pmOptions = colors.length
+        ? colors
+        : (cover ? [{ name: '', image_url: cover }] : []);
+
+    if (!pmOptions.length) return;
+
+    const el = ensureProductModal();
+    el.querySelector('.pm-name').textContent = product.name;
+    el.querySelector('.pm-price').textContent = money(product.price);
+    el.querySelector('.pm-desc').textContent = product.description || '';
+    el.querySelector('.pm-desc').style.display = product.description ? '' : 'none';
+
+    const hasColors = colors.length > 0;
+    el.querySelector('.pm-colorlabel').style.display = hasColors ? '' : 'none';
+
+    const thumbs = el.querySelector('.pm-thumbs');
+    thumbs.innerHTML = '';
+    thumbs.style.display = pmOptions.length > 1 ? '' : 'none';
+
+    pmOptions.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pm-thumb';
+        const im = document.createElement('img');
+        im.src = opt.image_url;
+        im.alt = '';
+        const label = document.createElement('span');
+        label.textContent = opt.name || ('Option ' + (i + 1));
+        b.append(im, label);
+        b.addEventListener('click', () => selectColor(i));
+        thumbs.appendChild(b);
+    });
+
+    selectColor(0);
+    el.hidden = false;
+    document.body.classList.add('pm-open');
+}
+
+function closeProduct() {
+    if (!pmEl) return;
+    pmEl.hidden = true;
+    document.body.classList.remove('pm-open');
 }
