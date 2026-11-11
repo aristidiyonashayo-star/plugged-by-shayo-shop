@@ -3,9 +3,9 @@
    Put the files in the "media" folder.
 ========================================= */
 const SHOP_IMAGES = [
-    'media/shop-1.jpg',
-    'media/shop-2.jpg',
-    'media/shop-3.jpg'
+    'shop-1.jpg',
+    'shop-2.jpg',
+    'shop-3.jpg'
 ];
 
 const SLIDE_SECONDS = 4;

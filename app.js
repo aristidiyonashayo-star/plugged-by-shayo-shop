@@ -792,7 +792,7 @@ document.addEventListener('click', e => {
    ORDER BUTTON: share the real photo when possible
 ========================================= */
 
-async function handleOrderClick(btn) {
+function handleOrderClick(btn) {
 
     // Product has several colors: let the customer pick one first
     if (btn.dataset.multi === '1' && btn.dataset.pid) {
@@ -800,42 +800,12 @@ async function handleOrderClick(btn) {
         return;
     }
 
-    const text = btn.dataset.orderText || '';
-    const imageUrl = btn.dataset.orderImage || '';
-    const fallbackUrl = btn.dataset.orderFallback || '';
-    const name = btn.dataset.orderName || 'Product';
-
-    // Try the device's native share sheet with the actual image attached.
-    // Supported on most phones; WhatsApp shows up as a share target there.
-    if (imageUrl && navigator.canShare) {
-        try {
-            const response = await fetch(imageUrl);
-            if (response.ok) {
-                const blob = await response.blob();
-                const file = new File(
-                    [blob],
-                    'product.jpg',
-                    { type: blob.type || 'image/jpeg' }
-                );
-
-                if (navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], text, title: name });
-                    return; // shared with the real image attached — done
-                }
-            }
-        } catch (err) {
-            if (err && err.name === 'AbortError') return; // user cancelled the share sheet
-            // otherwise fall through to the WhatsApp link fallback below
-        }
-    }
-
-    // Fallback (desktop browsers, or if sharing failed): open WhatsApp chat
-    // directly with the order text, including the image link.
-    if (fallbackUrl) {
-        window.open(fallbackUrl, '_blank', 'noopener');
+    // Open a WhatsApp chat with the shop number and the order message ready to send
+    const url = btn.dataset.orderFallback || '';
+    if (url) {
+        window.open(url, '_blank', 'noopener');
     }
 }
-
 
 /* =========================================
    PRODUCT VIEW: tap a product to see its colors
